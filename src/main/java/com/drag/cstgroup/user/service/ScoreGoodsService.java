@@ -12,10 +12,10 @@ import org.springframework.stereotype.Service;
 import com.drag.cstgroup.common.BaseResponse;
 import com.drag.cstgroup.common.Constant;
 import com.drag.cstgroup.common.exception.AMPException;
-import com.drag.cstgroup.user.dao.DragGoodsDao;
+import com.drag.cstgroup.user.dao.ScoreGoodsDao;
 import com.drag.cstgroup.user.dao.UserDao;
-import com.drag.cstgroup.user.dao.UserDragRecordDao;
-import com.drag.cstgroup.user.dao.UserDragUsedRecordDao;
+import com.drag.cstgroup.user.dao.UserScoreRecordDao;
+import com.drag.cstgroup.user.dao.UserScoreUsedRecordDao;
 import com.drag.cstgroup.user.dao.UserTicketTemplateDao;
 import com.drag.cstgroup.user.entity.ScoreGoods;
 import com.drag.cstgroup.user.entity.User;
@@ -37,15 +37,15 @@ import lombok.extern.slf4j.Slf4j;
 public class ScoreGoodsService {
 
 	@Autowired
-	private DragGoodsDao drGoodsDao;
+	private ScoreGoodsDao drGoodsDao;
 	@Autowired
 	private UserDao userDao;
 	@Autowired
 	private UserTicketService userTicketService;
 	@Autowired
-	private UserDragRecordDao userDragRecordDao;
+	private UserScoreRecordDao userDragRecordDao;
 	@Autowired
-	private UserDragUsedRecordDao userDragUsedRecordDao;
+	private UserScoreUsedRecordDao userDragUsedRecordDao;
 	@Autowired
 	private UserTicketTemplateDao userTicketTemplateDao;
 
@@ -97,7 +97,7 @@ public class ScoreGoodsService {
 			UserScoreUsedRecordVo vo = new UserScoreUsedRecordVo();
 			ScoreGoods goods = drGoodsDao.findGoodsDetail(record.getGoodsId()); 
 			BeanUtils.copyProperties(record, vo,new String[]{"createTime", "updateTime"});
-			vo.setGoodsName(goods.getDrgoodsName());
+			vo.setGoodsName(goods.getGoodsName());
 			vo.setCreateTime((DateUtil.format(record.getCreateTime(), "yyyy-MM-dd HH:mm:ss")));
 			goodsResp.add(vo);
 		}
@@ -174,7 +174,7 @@ public class ScoreGoodsService {
 				return resp;
 			}
 			
-			this.addDragUsedRecord(user, goodsId,dragGoods.getDrgoodsName(),Constant.TYPE_DR, score);
+			this.addDragUsedRecord(user, goodsId,dragGoods.getGoodsName(),Constant.TYPE_DR, score);
 			
 			UserTicketForm uForm = new UserTicketForm();
 			uForm.setGoodsId(goodsId);

@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import com.drag.cstgroup.user.entity.ScoreGoods;
 
 
-public interface DragGoodsDao extends JpaRepository<ScoreGoods, String>, JpaSpecificationExecutor<ScoreGoods> {
+public interface ScoreGoodsDao extends JpaRepository<ScoreGoods, String>, JpaSpecificationExecutor<ScoreGoods> {
 	
 	List<ScoreGoods> findByIsEnd(int isEnd);
 	

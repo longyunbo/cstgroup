@@ -21,7 +21,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @DynamicInsert
 @DynamicUpdate
-@Table(name = "drag_goods")
+@Table(name = "t_score_goods")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -33,11 +33,11 @@ public class ScoreGoods implements Serializable {
 	 * 积分商品自增id
 	 */
 	@Id
-	private int drgoodsId;
+	private int goodsId;
 	/**
 	 * 积分商品名称
 	 */
-	private String drgoodsName;
+	private String goodsName;
 	/**
 	 * 积分价格
 	 */
@@ -45,7 +45,7 @@ public class ScoreGoods implements Serializable {
 	/**
 	 * 商品价格(默认价格)
 	 */
-	private BigDecimal drPrice;
+	private BigDecimal defPrice;
 	/**
 	 * 积分开始时间
 	 */
@@ -57,7 +57,7 @@ public class ScoreGoods implements Serializable {
 	/**
 	 * 商品库存数量
 	 */
-	private int drgoodsNumber;
+	private int goodsNumber;
 	/**
 	 * 商品剪短描述
 	 */
@@ -77,11 +77,11 @@ public class ScoreGoods implements Serializable {
 	/**
 	 * 商品微缩图
 	 */
-	private String drgoodsThumb;
+	private String goodsThumb;
 	/**
 	 * 商品详情轮播图
 	 */
-	private String drgoodsImgs;
+	private String goodsImgs;
 	/**
 	 * 该商品显示顺序（越大越靠后）
 	 */
@@ -101,6 +101,6 @@ public class ScoreGoods implements Serializable {
 	/**
 	 * 兑换人数
 	 */
-	private int drSuccTimes;
+	private int succTimes;
 
 }

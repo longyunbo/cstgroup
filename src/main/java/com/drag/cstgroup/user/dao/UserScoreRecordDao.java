@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import com.drag.cstgroup.user.entity.UserScoreRecord;
 
 
-public interface UserDragRecordDao extends JpaRepository<UserScoreRecord, String>, JpaSpecificationExecutor<UserScoreRecord> {
+public interface UserScoreRecordDao extends JpaRepository<UserScoreRecord, String>, JpaSpecificationExecutor<UserScoreRecord> {
 	
 	
 	@Query(value = "select * from t_user_drag_record where uid = ?1", nativeQuery = true)

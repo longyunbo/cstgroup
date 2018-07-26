@@ -26,7 +26,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @DynamicInsert
 @DynamicUpdate
-@Table(name = "t_user_drag_used_record")
+@Table(name = "t_user_score_used_record")
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
