@@ -3,7 +3,7 @@ package com.drag.cstgroup.user.form;
 import lombok.Data;
 
 @Data
-public class DragBoneForm {
+public class ScoreForm {
 	
 	/**
 	 * 用户id
@@ -14,13 +14,13 @@ public class DragBoneForm {
 	 */
 	private int goodsId;
 	/**
-	 * 类型:pt-拼团,ms-秒杀,zl-助力,kj-砍价,drag-恐龙骨
+	 * 类型:pt-拼团,ms-秒杀,zl-助力,kj-砍价,drag-积分
 	 */
 	private String type;
 	/**
-	 * 消耗恐龙骨
+	 * 消耗积分
 	 */
-	private int dragBone;
+	private int score;
 	
 	
 	

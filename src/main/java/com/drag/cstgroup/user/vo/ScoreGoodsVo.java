@@ -1,45 +1,28 @@
-package com.drag.cstgroup.user.entity;
+package com.drag.cstgroup.user.vo;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.Date;
 
-import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.Table;
 
-import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.DynamicUpdate;
-
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 
 @Data
-@Entity
-@DynamicInsert
-@DynamicUpdate
-@Table(name = "drag_goods")
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @EqualsAndHashCode(callSuper=false)
-public class DragGoods implements Serializable {
+public class ScoreGoodsVo{
 
 	private static final long serialVersionUID = -7019193751237613050L;
 	/**
-	 * 恐龙骨商品自增id
+	 * 积分商品自增id
 	 */
 	@Id
 	private int drgoodsId;
 	/**
-	 * 恐龙骨商品名称
+	 * 积分商品名称
 	 */
 	private String drgoodsName;
 	/**
-	 * 恐龙骨价格
+	 * 积分价格
 	 */
 	private BigDecimal price;
 	/**
@@ -47,13 +30,13 @@ public class DragGoods implements Serializable {
 	 */
 	private BigDecimal drPrice;
 	/**
-	 * 恐龙骨开始时间
+	 * 积分开始时间
 	 */
-	private Date startTime;
+	private String startTime;
 	/**
-	 * 恐龙骨结束时间
+	 * 积分结束时间
 	 */
-	private Date endTime;
+	private String endTime;
 	/**
 	 * 商品库存数量
 	 */
@@ -67,9 +50,9 @@ public class DragGoods implements Serializable {
 	 */
 	private String content;
 	/**
-	 * 恐龙骨
+	 * 积分
 	 */
-	private int dragBone;
+	private int score;
 	/**
 	 * 经验值
 	 */
@@ -89,11 +72,11 @@ public class DragGoods implements Serializable {
 	/**
 	 * 创建时间
 	 */
-	private Date createTime;
+	private String createTime;
 	/**
 	 * 修改时间
 	 */
-	private Date updateTime;
+	private String updateTime;
 	/**
 	 * 是否结束，1，是；0，否
 	 */

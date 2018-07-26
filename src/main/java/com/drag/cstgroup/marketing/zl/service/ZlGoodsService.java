@@ -30,7 +30,7 @@ import com.drag.cstgroup.user.dao.UserTicketTemplateDao;
 import com.drag.cstgroup.user.entity.User;
 import com.drag.cstgroup.user.entity.UserTicket;
 import com.drag.cstgroup.user.entity.UserTicketTemplate;
-import com.drag.cstgroup.user.service.DragGoodsService;
+import com.drag.cstgroup.user.service.ScoreGoodsService;
 import com.drag.cstgroup.user.service.UserService;
 import com.drag.cstgroup.user.vo.UserVo;
 import com.drag.cstgroup.utils.BeanUtils;
@@ -55,7 +55,7 @@ public class ZlGoodsService {
 	@Autowired
 	private UserTicketDao userTicketDao;
 	@Autowired
-	private DragGoodsService dragGoodsService;
+	private ScoreGoodsService dragGoodsService;
 	@Autowired
 	private UserService userService;
 	@Value("${weixin.url.zl.templateid}")
@@ -435,8 +435,8 @@ public class ZlGoodsService {
 						int isHeader = user.getIsHeader();
 //						User us = userDao.findOne(user.getUid());
 						String uid = String.valueOf(user.getUid());
-						//新增恐龙骨
-						dragGoodsService.addDragBone(userMap.get(uid),goods.getZlgoodsId(),goods.getZlgoodsName(),Constant.TYPE_ZL,goods.getDragBone(), goods.getExp());
+						//新增积分
+						dragGoodsService.addscore(userMap.get(uid),goods.getZlgoodsId(),goods.getZlgoodsName(),Constant.TYPE_ZL,goods.getScore(), goods.getExp());
 						//给团长发送卡券
 						if(ZlUser.ISHEADER_YES == isHeader) {
 							if(template != null) {

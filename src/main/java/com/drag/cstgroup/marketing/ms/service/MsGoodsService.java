@@ -25,7 +25,7 @@ import com.drag.cstgroup.user.dao.UserTicketTemplateDao;
 import com.drag.cstgroup.user.entity.User;
 import com.drag.cstgroup.user.entity.UserTicket;
 import com.drag.cstgroup.user.entity.UserTicketTemplate;
-import com.drag.cstgroup.user.service.DragGoodsService;
+import com.drag.cstgroup.user.service.ScoreGoodsService;
 import com.drag.cstgroup.user.vo.UserVo;
 import com.drag.cstgroup.utils.BeanUtils;
 import com.drag.cstgroup.utils.DateUtil;
@@ -47,7 +47,7 @@ public class MsGoodsService {
 	@Autowired
 	private UserTicketDao userTicketDao;
 	@Autowired
-	private DragGoodsService dragGoodsService;
+	private ScoreGoodsService dragGoodsService;
 
 	/**
 	 * 查询所有的秒杀商品(秒杀列表)
@@ -173,8 +173,8 @@ public class MsGoodsService {
 			//新增秒杀次数
 			this.addMsTimes(goods);
 			
-			//新增恐龙骨
-			dragGoodsService.addDragBone(user,goods.getMsgoodsId(),goods.getMsgoodsName(),Constant.TYPE_MS,goods.getDragBone(), goods.getExp());
+			//新增积分
+			dragGoodsService.addscore(user,goods.getMsgoodsId(),goods.getMsgoodsName(),Constant.TYPE_MS,goods.getScore(), goods.getExp());
 			
 			String type = Constant.TYPE_MS;
 			UserTicketTemplate  template = userTicketTemplateDao.findByGoodsIdAndType(msgoodsId, type);

@@ -31,7 +31,7 @@ import com.drag.cstgroup.user.dao.UserTicketTemplateDao;
 import com.drag.cstgroup.user.entity.User;
 import com.drag.cstgroup.user.entity.UserTicket;
 import com.drag.cstgroup.user.entity.UserTicketTemplate;
-import com.drag.cstgroup.user.service.DragGoodsService;
+import com.drag.cstgroup.user.service.ScoreGoodsService;
 import com.drag.cstgroup.user.service.UserService;
 import com.drag.cstgroup.user.vo.UserVo;
 import com.drag.cstgroup.utils.BeanUtils;
@@ -58,7 +58,7 @@ public class PtGoodsService {
 	@Autowired
 	private UserTicketDao userTicketDao;
 	@Autowired
-	private DragGoodsService dragGoodsService;
+	private ScoreGoodsService dragGoodsService;
 	@Autowired
 	private UserService userService;
 	@Value("${weixin.url.pt.templateid}")
@@ -494,8 +494,8 @@ public class PtGoodsService {
 						}
 						ptUserDao.saveAndFlush(user);
 						
-						//新增恐龙骨
-						dragGoodsService.addDragBone(userMap.get(uid), goods.getPtgoodsId(),goods.getPtgoodsName(),Constant.TYPE_PT,goods.getDragBone(), goods.getExp());
+						//新增积分
+						dragGoodsService.addscore(userMap.get(uid), goods.getPtgoodsId(),goods.getPtgoodsName(),Constant.TYPE_PT,goods.getScore(), goods.getExp());
 					}
 				}
 			}

@@ -6,15 +6,15 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 
-import com.drag.cstgroup.user.entity.DragGoods;
+import com.drag.cstgroup.user.entity.ScoreGoods;
 
 
-public interface DragGoodsDao extends JpaRepository<DragGoods, String>, JpaSpecificationExecutor<DragGoods> {
+public interface DragGoodsDao extends JpaRepository<ScoreGoods, String>, JpaSpecificationExecutor<ScoreGoods> {
 	
-	List<DragGoods> findByIsEnd(int isEnd);
+	List<ScoreGoods> findByIsEnd(int isEnd);
 	
 	@Query(value = "select * from drag_goods where drgoods_id = ?1", nativeQuery = true)
-	DragGoods findGoodsDetail(int goodsId);
+	ScoreGoods findGoodsDetail(int goodsId);
 	
 	
 }

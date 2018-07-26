@@ -48,17 +48,13 @@ public class UserVo implements Serializable {
 	 */
 	private int rankLevel;
 	/**
-	 * 恐龙骨
+	 * 积分
 	 */
-	private int dragBone;
+	private int score;
 	/**
 	 * 经验值
 	 */
 	private int exp;
-	/**
-	 * 积分
-	 */
-	private String score;
 	/**
 	 * 砍价价格（砍价用到的字段）
 	 */

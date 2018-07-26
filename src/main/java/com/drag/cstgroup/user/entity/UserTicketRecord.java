@@ -49,7 +49,7 @@ public class UserTicketRecord implements Serializable {
 	 */
 	private int goodsId;
 	/**
-	 * 类型:pt-拼团,ms-秒杀,zl-助力,kj-砍价,drag-恐龙骨
+	 * 类型:pt-拼团,ms-秒杀,zl-助力,kj-砍价,drag-积分
 	 */
 	private String type;
 	/**

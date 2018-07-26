@@ -55,9 +55,9 @@ public class ZlGoodsDetailVo{
 	 */
 	private String content;
 	/**
-	 * 恐龙骨
+	 * 积分
 	 */
-	private int dragBone;
+	private int score;
 	/**
 	 * 经验值
 	 */

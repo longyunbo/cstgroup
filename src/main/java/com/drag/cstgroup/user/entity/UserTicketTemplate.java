@@ -43,7 +43,7 @@ public class UserTicketTemplate implements Serializable {
 	 */
 	private int goodsId;
 	/**
-	 * 类型:pt-拼团,ms-秒杀,zl-助力,kj-砍价,drag-恐龙骨
+	 * 类型:pt-拼团,ms-秒杀,zl-助力,kj-砍价,drag-积分
 	 */
 	private String type;
 	/**
@@ -75,9 +75,9 @@ public class UserTicketTemplate implements Serializable {
 	 */
 	private BigDecimal price;
 	/**
-	 * 恐龙骨
+	 * 积分
 	 */
-	private int dragBone;
+	private int score;
 	/**
 	 * 使用期限
 	 */

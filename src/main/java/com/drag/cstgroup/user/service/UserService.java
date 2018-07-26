@@ -153,7 +153,7 @@ public class UserService {
 			vo.setGoodsNumber(goods.getPtgoodsNumber());
 			vo.setDescription(goods.getDescription());
 			vo.setContent(goods.getContent());
-			vo.setDragBone(goods.getDragBone());
+			vo.setScore(goods.getScore());
 			vo.setExp(goods.getExp());
 			vo.setGoodsThumb(goods.getPtgoodsThumb());
 			vo.setCreateTime(DateUtil.format(goods.getCreateTime(), "yyyy-MM-dd HH:mm:ss"));
@@ -180,7 +180,7 @@ public class UserService {
 			vo.setGoodsNumber(goods.getKjgoodsNumber());
 			vo.setDescription(goods.getDescription());
 			vo.setContent(goods.getContent());
-			vo.setDragBone(goods.getDragBone());
+			vo.setScore(goods.getScore());
 			vo.setExp(goods.getExp());
 			vo.setGoodsThumb(goods.getKjgoodsThumb());
 			vo.setCreateTime(DateUtil.format(goods.getCreateTime(), "yyyy-MM-dd HH:mm:ss"));
@@ -206,7 +206,7 @@ public class UserService {
 			vo.setGoodsNumber(goods.getZlgoodsNumber());
 			vo.setDescription(goods.getDescription());
 			vo.setContent(goods.getContent());
-			vo.setDragBone(goods.getDragBone());
+			vo.setScore(goods.getScore());
 			vo.setExp(goods.getExp());
 			vo.setGoodsThumb(goods.getZlgoodsThumb());
 			vo.setCreateTime(DateUtil.format(goods.getCreateTime(), "yyyy-MM-dd HH:mm:ss"));

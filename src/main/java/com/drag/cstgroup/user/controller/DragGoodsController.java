@@ -15,10 +15,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.drag.cstgroup.common.BaseResponse;
-import com.drag.cstgroup.user.form.DragBoneForm;
-import com.drag.cstgroup.user.service.DragGoodsService;
-import com.drag.cstgroup.user.vo.DragGoodsVo;
-import com.drag.cstgroup.user.vo.UserDragUsedRecordVo;
+import com.drag.cstgroup.user.form.ScoreForm;
+import com.drag.cstgroup.user.service.ScoreGoodsService;
+import com.drag.cstgroup.user.vo.ScoreGoodsVo;
+import com.drag.cstgroup.user.vo.UserScoreUsedRecordVo;
 import com.drag.cstgroup.user.vo.UserTicketTemplateVo;
 
 
@@ -31,20 +31,20 @@ public class DragGoodsController {
 	private final static Logger log = LoggerFactory.getLogger(DragGoodsController.class);
 
 	@Autowired
-	private DragGoodsService drGoodsService;
+	private ScoreGoodsService drGoodsService;
 	
 	/**
-	 * 查询所有的恐龙骨兑换商品
+	 * 查询所有的积分兑换商品
 	 * @return
 	 */
 	@RequestMapping(value = "/list", method = {RequestMethod.POST,RequestMethod.GET})
-	public @ResponseBody ResponseEntity<List<DragGoodsVo>> listGoods() {
-		List<DragGoodsVo> rows= drGoodsService.listGoods();
-		return new ResponseEntity<List<DragGoodsVo>>(rows, HttpStatus.OK);
+	public @ResponseBody ResponseEntity<List<ScoreGoodsVo>> listGoods() {
+		List<ScoreGoodsVo> rows= drGoodsService.listGoods();
+		return new ResponseEntity<List<ScoreGoodsVo>>(rows, HttpStatus.OK);
 	}
 	
 	/**
-	 * 查询恐龙骨兑换商品详情
+	 * 查询积分兑换商品详情
 	 * @param goodsId
 	 * @return
 	 */
@@ -55,36 +55,36 @@ public class DragGoodsController {
 	}
 	
 	/**
-	 * 恐龙骨立即兑换
+	 * 积分立即兑换
 	 * @param form
 	 * @return
 	 */
 	@RequestMapping(value = "/exchange", method = {RequestMethod.POST,RequestMethod.GET})
-	public @ResponseBody ResponseEntity<BaseResponse> exchange(@RequestBody DragBoneForm form) {
+	public @ResponseBody ResponseEntity<BaseResponse> exchange(@RequestBody ScoreForm form) {
 		BaseResponse br = drGoodsService.exchange(form);
 		return new ResponseEntity<BaseResponse>(br, HttpStatus.OK);
 	}
 	
 	/**
-	 * 查询恐龙骨兑换记录
+	 * 查询积分兑换记录
 	 * @param openid
 	 * @return
 	 */
 	@RequestMapping(value = "/listrecord", method = {RequestMethod.POST,RequestMethod.GET})
-	public @ResponseBody ResponseEntity<List<UserDragUsedRecordVo>> listRecord(@RequestParam(required = true) String openid) {
-		List<UserDragUsedRecordVo> rows= drGoodsService.listRecord(openid);
-		return new ResponseEntity<List<UserDragUsedRecordVo>>(rows, HttpStatus.OK);
+	public @ResponseBody ResponseEntity<List<UserScoreUsedRecordVo>> listRecord(@RequestParam(required = true) String openid) {
+		List<UserScoreUsedRecordVo> rows= drGoodsService.listRecord(openid);
+		return new ResponseEntity<List<UserScoreUsedRecordVo>>(rows, HttpStatus.OK);
 	}
 	
 	/**
-	 * 查询恐龙骨详情
+	 * 查询积分详情
 	 * @param openid
 	 * @return
 	 */
 	@RequestMapping(value = "/listallrecord", method = {RequestMethod.POST,RequestMethod.GET})
-	public @ResponseBody ResponseEntity<List<UserDragUsedRecordVo>> listAllRecord(@RequestParam(required = true) String openid) {
-		List<UserDragUsedRecordVo> rows= drGoodsService.listAllRecord(openid);
-		return new ResponseEntity<List<UserDragUsedRecordVo>>(rows, HttpStatus.OK);
+	public @ResponseBody ResponseEntity<List<UserScoreUsedRecordVo>> listAllRecord(@RequestParam(required = true) String openid) {
+		List<UserScoreUsedRecordVo> rows= drGoodsService.listAllRecord(openid);
+		return new ResponseEntity<List<UserScoreUsedRecordVo>>(rows, HttpStatus.OK);
 	}
 	
 }

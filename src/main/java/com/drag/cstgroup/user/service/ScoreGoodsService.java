@@ -17,15 +17,15 @@ import com.drag.cstgroup.user.dao.UserDao;
 import com.drag.cstgroup.user.dao.UserDragRecordDao;
 import com.drag.cstgroup.user.dao.UserDragUsedRecordDao;
 import com.drag.cstgroup.user.dao.UserTicketTemplateDao;
-import com.drag.cstgroup.user.entity.DragGoods;
+import com.drag.cstgroup.user.entity.ScoreGoods;
 import com.drag.cstgroup.user.entity.User;
-import com.drag.cstgroup.user.entity.UserDragRecord;
-import com.drag.cstgroup.user.entity.UserDragUsedRecord;
+import com.drag.cstgroup.user.entity.UserScoreRecord;
+import com.drag.cstgroup.user.entity.UserScoreUsedRecord;
 import com.drag.cstgroup.user.entity.UserTicketTemplate;
-import com.drag.cstgroup.user.form.DragBoneForm;
+import com.drag.cstgroup.user.form.ScoreForm;
 import com.drag.cstgroup.user.form.UserTicketForm;
-import com.drag.cstgroup.user.vo.DragGoodsVo;
-import com.drag.cstgroup.user.vo.UserDragUsedRecordVo;
+import com.drag.cstgroup.user.vo.ScoreGoodsVo;
+import com.drag.cstgroup.user.vo.UserScoreUsedRecordVo;
 import com.drag.cstgroup.user.vo.UserTicketTemplateVo;
 import com.drag.cstgroup.utils.BeanUtils;
 import com.drag.cstgroup.utils.DateUtil;
@@ -34,7 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
-public class DragGoodsService {
+public class ScoreGoodsService {
 
 	@Autowired
 	private DragGoodsDao drGoodsDao;
@@ -50,15 +50,15 @@ public class DragGoodsService {
 	private UserTicketTemplateDao userTicketTemplateDao;
 
 	/**
-	 * 查询所有的恐龙骨兑换商品(恐龙骨兑换中心)
+	 * 查询所有的积分兑换商品(积分兑换中心)
 	 * @return
 	 */
-	public List<DragGoodsVo> listGoods() {
-		List<DragGoodsVo> goodsResp = new ArrayList<DragGoodsVo>();
-		List<DragGoods> goodsList = drGoodsDao.findAll();
+	public List<ScoreGoodsVo> listGoods() {
+		List<ScoreGoodsVo> goodsResp = new ArrayList<ScoreGoodsVo>();
+		List<ScoreGoods> goodsList = drGoodsDao.findAll();
 		if (goodsList != null && goodsList.size() > 0) {
-			for (DragGoods drgoods : goodsList) {
-				DragGoodsVo resp = new DragGoodsVo();
+			for (ScoreGoods drgoods : goodsList) {
+				ScoreGoodsVo resp = new ScoreGoodsVo();
 				BeanUtils.copyProperties(drgoods, resp,new String[]{"createTime", "updateTime","startTime","endTime"});
 				resp.setCreateTime((DateUtil.format(drgoods.getCreateTime(), "yyyy-MM-dd HH:mm:ss")));
 				resp.setUpdateTime((DateUtil.format(drgoods.getUpdateTime(), "yyyy-MM-dd HH:mm:ss")));
@@ -72,30 +72,30 @@ public class DragGoodsService {
 	
 	
 	/**
-	 * 查询恐龙骨详情商品
+	 * 查询积分详情商品
 	 * @return
 	 */
 	public UserTicketTemplateVo goodsDetail(int goodsId) {
 		UserTicketTemplateVo detailVo = new UserTicketTemplateVo();
 		UserTicketTemplate template = userTicketTemplateDao.findByGoodsIdAndType(goodsId, Constant.TYPE_DR);
-		DragGoods dragGoods = drGoodsDao.findGoodsDetail(goodsId);
+		ScoreGoods dragGoods = drGoodsDao.findGoodsDetail(goodsId);
 		BeanUtils.copyProperties(template, detailVo,new String[]{"createTime", "updateTime"});
 		detailVo.setCreateTime((DateUtil.format(dragGoods.getCreateTime(), "yyyy-MM-dd HH:mm:ss")));
 		return detailVo;
 	}
 	
 	/**
-	 * 查询恐龙骨兑换记录
+	 * 查询积分兑换记录
 	 * @param openid
 	 * @return
 	 */
-	public List<UserDragUsedRecordVo> listRecord(String openid) {
-		List<UserDragUsedRecordVo> goodsResp = new ArrayList<UserDragUsedRecordVo>();
+	public List<UserScoreUsedRecordVo> listRecord(String openid) {
+		List<UserScoreUsedRecordVo> goodsResp = new ArrayList<UserScoreUsedRecordVo>();
 		User user = userDao.findByOpenid(openid);
-		List<UserDragUsedRecord> records = userDragUsedRecordDao.findByUidAndType(user.getId(),Constant.TYPE_DR);
-		for(UserDragUsedRecord record : records) {
-			UserDragUsedRecordVo vo = new UserDragUsedRecordVo();
-			DragGoods goods = drGoodsDao.findGoodsDetail(record.getGoodsId()); 
+		List<UserScoreUsedRecord> records = userDragUsedRecordDao.findByUidAndType(user.getId(),Constant.TYPE_DR);
+		for(UserScoreUsedRecord record : records) {
+			UserScoreUsedRecordVo vo = new UserScoreUsedRecordVo();
+			ScoreGoods goods = drGoodsDao.findGoodsDetail(record.getGoodsId()); 
 			BeanUtils.copyProperties(record, vo,new String[]{"createTime", "updateTime"});
 			vo.setGoodsName(goods.getDrgoodsName());
 			vo.setCreateTime((DateUtil.format(record.getCreateTime(), "yyyy-MM-dd HH:mm:ss")));
@@ -105,31 +105,31 @@ public class DragGoodsService {
 	}
 	
 	
-	public List<UserDragUsedRecordVo> listAllRecord(String openid) {
-		List<UserDragUsedRecordVo> goodsResp = new ArrayList<UserDragUsedRecordVo>();
+	public List<UserScoreUsedRecordVo> listAllRecord(String openid) {
+		List<UserScoreUsedRecordVo> goodsResp = new ArrayList<UserScoreUsedRecordVo>();
 		User user = userDao.findByOpenid(openid);
 		int uid = user.getId();
 		
-		List<UserDragUsedRecord> userRecords = userDragUsedRecordDao.findByUid(uid);
+		List<UserScoreUsedRecord> userRecords = userDragUsedRecordDao.findByUid(uid);
 		if(userRecords != null & userRecords.size() > 0) {
-			for(UserDragUsedRecord record : userRecords) {
-				UserDragUsedRecordVo vo = new UserDragUsedRecordVo();
+			for(UserScoreUsedRecord record : userRecords) {
+				UserScoreUsedRecordVo vo = new UserScoreUsedRecordVo();
 				BeanUtils.copyProperties(record, vo,new String[]{"createTime", "updateTime"});
-				vo.setDragBone(record.getDragBone());
-				vo.setUsedDragBone(-record.getUsedDragBone());
+				vo.setScore(record.getScore());
+				vo.setUsedscore(-record.getUsedscore());
 				vo.setGoodsName(record.getGoodsName());
 				vo.setCreateTime((DateUtil.format(record.getCreateTime(), "yyyy-MM-dd HH:mm:ss")));
 				goodsResp.add(vo);
 			}
 		}
 		
-		List<UserDragRecord> records = userDragRecordDao.findByUid(uid);
+		List<UserScoreRecord> records = userDragRecordDao.findByUid(uid);
 		if(records != null & records.size() > 0) {
-			for(UserDragRecord record : records) {
-				UserDragUsedRecordVo vo = new UserDragUsedRecordVo();
+			for(UserScoreRecord record : records) {
+				UserScoreUsedRecordVo vo = new UserScoreUsedRecordVo();
 				BeanUtils.copyProperties(record, vo,new String[]{"createTime", "updateTime"});
-				vo.setDragBone(record.getDragBone());
-				vo.setUsedDragBone(record.getAvailableDragBone());
+				vo.setScore(record.getScore());
+				vo.setUsedscore(record.getAvailablescore());
 				vo.setGoodsName(record.getGoodsName());
 				vo.setCreateTime((DateUtil.format(record.getCreateTime(), "yyyy-MM-dd HH:mm:ss")));
 				goodsResp.add(vo);
@@ -140,22 +140,22 @@ public class DragGoodsService {
 	
 	
 	/**
-	 * 恐龙骨立即兑换优惠券
-	 * 1、减少用户恐龙骨
-	 * 2、恐龙骨使用记录表
+	 * 积分立即兑换优惠券
+	 * 1、减少用户积分
+	 * 2、积分使用记录表
 	 * 3、发送卡券
 	 * @return
 	 */
 	@Transactional
-	public BaseResponse exchange(DragBoneForm form) {
+	public BaseResponse exchange(ScoreForm form) {
 		BaseResponse resp = new BaseResponse();
 		try {
 			int goodsId = form.getGoodsId();
 			String openid = form.getOpenid();
-			int dragBone = form.getDragBone();
+			int score = form.getScore();
 			User user = userDao.findByOpenid(openid);
 			
-			DragGoods dragGoods = drGoodsDao.findGoodsDetail(goodsId);
+			ScoreGoods dragGoods = drGoodsDao.findGoodsDetail(goodsId);
 			if(dragGoods == null) {
 				resp.setReturnCode(Constant.PRODUCTNOTEXISTS);
 				resp.setErrorMessage("该商品不存在!");
@@ -166,15 +166,15 @@ public class DragGoodsService {
 				resp.setErrorMessage("该用户不存在!");
 				return resp;
 			}
-			Boolean flag = this.delDragBone(user,dragBone);
+			Boolean flag = this.delscore(user,score);
 			if(!flag) {
 				resp.setReturnCode(Constant.STOCK_FAIL);
-				resp.setErrorMessage("恐龙骨不足！");
-				log.error("该用户恐龙骨不足,openid:{}",openid);
+				resp.setErrorMessage("积分不足！");
+				log.error("该用户积分不足,openid:{}",openid);
 				return resp;
 			}
 			
-			this.addDragUsedRecord(user, goodsId,dragGoods.getDrgoodsName(),Constant.TYPE_DR, dragBone);
+			this.addDragUsedRecord(user, goodsId,dragGoods.getDrgoodsName(),Constant.TYPE_DR, score);
 			
 			UserTicketForm uForm = new UserTicketForm();
 			uForm.setGoodsId(goodsId);
@@ -182,7 +182,7 @@ public class DragGoodsService {
 			uForm.setOpenid(openid);
 			userTicketService.sendTicket(uForm);
 			resp.setReturnCode(Constant.SUCCESS);
-			resp.setErrorMessage("使用恐龙骨成功！");
+			resp.setErrorMessage("使用积分成功！");
 		} catch (Exception e) {
 			log.error("系统异常,{}",e);
 			throw AMPException.getException("系统异常!");
@@ -193,21 +193,21 @@ public class DragGoodsService {
 	
 	
 	/**
-	 * 用户减恐龙骨
+	 * 用户减积分
 	 * @param goods
 	 * @param number
 	 * @return
 	 */
-	public Boolean delDragBone(User user, int number) {
+	public Boolean delscore(User user, int number) {
 		boolean flag = false;
-		int dragBone = user.getDragBone();
-		if (dragBone - number < 0) {
+		int score = user.getScore();
+		if (score - number < 0) {
 			// 库存不足
 			flag = false;
 		} else {
 			flag = true;
-			int nowGoodsNum = dragBone - number;
-			user.setDragBone(nowGoodsNum);
+			int nowGoodsNum = score - number;
+			user.setScore(nowGoodsNum);
 			userDao.saveAndFlush(user);
 		}
 		return flag;
@@ -215,20 +215,20 @@ public class DragGoodsService {
 	
 	/**
 	 * 用户参加各种活动插入数据
-	 * 1、用户加恐龙骨，经验值
-	 * 2、会员恐龙骨记录表
+	 * 1、用户加积分，经验值
+	 * 2、会员积分记录表
 	 * @param user
 	 * @param number
 	 * @return
 	 */
 	@Transactional
-	public void addDragBone(User user,int goodsId,String goodsName,String type, int dragBone,int exp) {
+	public void addscore(User user,int goodsId,String goodsName,String type, int score,int exp) {
 		try {
-			int udragBone = user.getDragBone();
+			int uscore = user.getScore();
 			int uexp = user.getExp();
-			int nowDragBone = udragBone + dragBone;
+			int nowscore = uscore + score;
 			int nowExp =  uexp + exp;
-			user.setDragBone(nowDragBone);
+			user.setScore(nowscore);
 			user.setExp(nowExp);
 			//0恐龙蛋-注册，1幼年霸王龙=1000，2青年霸王龙=3000，3成年霸王龙=5000
 			if(nowExp<1000) {
@@ -241,19 +241,19 @@ public class DragGoodsService {
 				user.setRankLevel(3);
 			}
 			userDao.saveAndFlush(user);
-			//会员恐龙骨记录表
-			UserDragRecord dragRecord = new UserDragRecord();
+			//会员积分记录表
+			UserScoreRecord dragRecord = new UserScoreRecord();
 			dragRecord.setId(dragRecord.getId());
 			dragRecord.setUid(user.getId());
 			dragRecord.setGoodsId(goodsId);
 			dragRecord.setGoodsName(goodsName);
 			dragRecord.setType(type);
-			//当前当前恐龙骨
-			dragRecord.setDragBone(nowDragBone);
-			//获得恐龙骨
-			dragRecord.setAvailableDragBone(dragBone);
+			//当前当前积分
+			dragRecord.setScore(nowscore);
+			//获得积分
+			dragRecord.setAvailablescore(score);
 			dragRecord.setCreateTime(new Timestamp(System.currentTimeMillis()));
-			//插入会员恐龙骨记录表
+			//插入会员积分记录表
 			userDragRecordDao.save(dragRecord);
 		} catch (Exception e) {
 			log.error("系统异常,{}",e);
@@ -263,32 +263,32 @@ public class DragGoodsService {
 	}
 	
 	/**
-	 * 恐龙骨使用记录入库
+	 * 积分使用记录入库
 	 * @param user
 	 * @param goods_id
 	 * @param type
-	 * @param dragBone
+	 * @param score
 	 */
 	@Transactional
-	public void addDragUsedRecord(User user,int goodsId,String goodsName,String type, int dragBone) {
+	public void addDragUsedRecord(User user,int goodsId,String goodsName,String type, int score) {
 		try {
-			int udragBone = user.getDragBone();
-			int nowDragBone = udragBone - dragBone;
-			user.setDragBone(nowDragBone);
+			int uscore = user.getScore();
+			int nowscore = uscore - score;
+			user.setScore(nowscore);
 			userDao.saveAndFlush(user);
-			//会员恐龙骨记录表
-			UserDragUsedRecord dragRecord = new UserDragUsedRecord();
+			//会员积分记录表
+			UserScoreUsedRecord dragRecord = new UserScoreUsedRecord();
 			dragRecord.setId(dragRecord.getId());
 			dragRecord.setUid(user.getId());
 			dragRecord.setGoodsId(goodsId);
 			dragRecord.setGoodsName(goodsName);
 			dragRecord.setType(type);
-			//当前当前恐龙骨
-			dragRecord.setDragBone(nowDragBone);
-			//获得恐龙骨
-			dragRecord.setUsedDragBone(dragBone);
+			//当前当前积分
+			dragRecord.setScore(nowscore);
+			//获得积分
+			dragRecord.setUsedscore(score);
 			dragRecord.setCreateTime(new Timestamp(System.currentTimeMillis()));
-			//插入会员恐龙骨使用记录表
+			//插入会员积分使用记录表
 			userDragUsedRecordDao.save(dragRecord);
 		} catch (Exception e) {
 			log.error("系统异常,{}",e);

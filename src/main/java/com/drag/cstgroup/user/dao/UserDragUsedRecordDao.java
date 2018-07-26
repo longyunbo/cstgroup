@@ -6,16 +6,16 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 
-import com.drag.cstgroup.user.entity.UserDragUsedRecord;
+import com.drag.cstgroup.user.entity.UserScoreUsedRecord;
 
 
-public interface UserDragUsedRecordDao extends JpaRepository<UserDragUsedRecord, String>, JpaSpecificationExecutor<UserDragUsedRecord> {
+public interface UserDragUsedRecordDao extends JpaRepository<UserScoreUsedRecord, String>, JpaSpecificationExecutor<UserScoreUsedRecord> {
 	
 	@Query(value = "select * from t_user_drag_used_record where uid = ?1 and type = ?2", nativeQuery = true)
-	List<UserDragUsedRecord> findByUidAndType(int uid,String type);
+	List<UserScoreUsedRecord> findByUidAndType(int uid,String type);
 	
 	@Query(value = "select * from t_user_drag_used_record where uid = ?1", nativeQuery = true)
-	List<UserDragUsedRecord> findByUid(int uid);
+	List<UserScoreUsedRecord> findByUid(int uid);
 	
 	
 }

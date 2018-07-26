@@ -11,7 +11,7 @@ import lombok.EqualsAndHashCode;
  */
 @Data
 @EqualsAndHashCode(callSuper=false)
-public class UserDragUsedRecordVo{
+public class UserScoreUsedRecordVo{
 
 	@Id
 	private int id;
@@ -28,17 +28,17 @@ public class UserDragUsedRecordVo{
 	 */
 	private String goodsName;
 	/**
-	 * 类型:pt-拼团,ms-秒杀,zl-助力,kj-砍价,drag-恐龙骨
+	 * 类型:pt-拼团,ms-秒杀,zl-助力,kj-砍价,drag-积分
 	 */
 	private String type;
 	/**
 	 * 当前积分
 	 */
-	private int dragBone;
+	private int score;
 	/**
 	 * 使用积分
 	 */
-	private int usedDragBone;
+	private int usedscore;
 	/**
 	 * 创建时间
 	 */
