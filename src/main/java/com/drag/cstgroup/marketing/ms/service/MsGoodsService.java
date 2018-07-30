@@ -47,7 +47,7 @@ public class MsGoodsService {
 	@Autowired
 	private UserTicketDao userTicketDao;
 	@Autowired
-	private ScoreGoodsService dragGoodsService;
+	private ScoreGoodsService scoreGoodsService;
 
 	/**
 	 * 查询所有的秒杀商品(秒杀列表)
@@ -89,6 +89,7 @@ public class MsGoodsService {
 					User user = userDao.findOne(uid);
 					userVo.setPrice(pu.getPrice());
 					userVo.setNumber(pu.getNumber());
+					userVo.setCreateTime(DateUtil.format(pu.getCreateTime(), "yyyy-MM-dd HH:mm:ss"));
 					if(user != null) {
 						BeanUtils.copyProperties(user, userVo);
 						grouperList.add(userVo);
@@ -174,7 +175,7 @@ public class MsGoodsService {
 			this.addMsTimes(goods);
 			
 			//新增积分
-			dragGoodsService.addscore(user,goods.getMsgoodsId(),goods.getMsgoodsName(),Constant.TYPE_MS,goods.getScore(), goods.getExp());
+			scoreGoodsService.addscore(user,goods.getMsgoodsId(),goods.getMsgoodsName(),Constant.TYPE_MS,goods.getScore(), goods.getExp());
 			
 			String type = Constant.TYPE_MS;
 			UserTicketTemplate  template = userTicketTemplateDao.findByGoodsIdAndType(msgoodsId, type);

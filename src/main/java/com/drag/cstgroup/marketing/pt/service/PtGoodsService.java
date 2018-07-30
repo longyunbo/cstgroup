@@ -58,7 +58,7 @@ public class PtGoodsService {
 	@Autowired
 	private UserTicketDao userTicketDao;
 	@Autowired
-	private ScoreGoodsService dragGoodsService;
+	private ScoreGoodsService scoreGoodsService;
 	@Autowired
 	private UserService userService;
 	@Value("${weixin.url.pt.templateid}")
@@ -104,6 +104,7 @@ public class PtGoodsService {
 					UserVo userVo = new UserVo();
 					int groupId = pu.getGrouperId();
 					userVo.setCode(pu.getPtcode());
+					userVo.setCreateTime(DateUtil.format(pu.getCreateTime(), "yyyy-MM-dd HH:mm:ss"));
 					User user = userDao.findOne(groupId);
 					if(user != null) {
 						BeanUtils.copyProperties(user, userVo);
@@ -495,7 +496,7 @@ public class PtGoodsService {
 						ptUserDao.saveAndFlush(user);
 						
 						//新增积分
-						dragGoodsService.addscore(userMap.get(uid), goods.getPtgoodsId(),goods.getPtgoodsName(),Constant.TYPE_PT,goods.getScore(), goods.getExp());
+						scoreGoodsService.addscore(userMap.get(uid), goods.getPtgoodsId(),goods.getPtgoodsName(),Constant.TYPE_PT,goods.getScore(), goods.getExp());
 					}
 				}
 			}

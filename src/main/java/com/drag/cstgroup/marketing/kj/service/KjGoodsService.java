@@ -59,7 +59,7 @@ public class KjGoodsService {
 	@Autowired
 	private UserTicketDao userTicketDao;
 	@Autowired
-	private ScoreGoodsService dragGoodsService;
+	private ScoreGoodsService scoreGoodsService;
 	@Autowired
 	private UserService userService;
 	@Value("${weixin.url.kj.templateid}")
@@ -107,6 +107,7 @@ public class KjGoodsService {
 					User user = userDao.findOne(groupId);
 					userVo.setPrice(pu.getPrice());
 					userVo.setCode(pu.getKjcode());
+					userVo.setCreateTime(DateUtil.format(pu.getCreateTime(), "yyyy-MM-dd HH:mm:ss"));
 					if(user != null) {
 						BeanUtils.copyProperties(user, userVo);
 						grouperList.add(userVo);
@@ -467,7 +468,7 @@ public class KjGoodsService {
 //						User us = userDao.findOne(user.getUid());
 						String uid = String.valueOf(user.getUid());
 						//新增积分
-						dragGoodsService.addscore(userMap.get(uid),goods.getKjgoodsId(),goods.getKjgoodsName(),Constant.TYPE_KJ,goods.getScore(), goods.getExp());
+						scoreGoodsService.addscore(userMap.get(uid),goods.getKjgoodsId(),goods.getKjgoodsName(),Constant.TYPE_KJ,goods.getScore(), goods.getExp());
 						//给团长发送卡券
 						if(ZlUser.ISHEADER_YES == isHeader) {
 							if(template != null) {

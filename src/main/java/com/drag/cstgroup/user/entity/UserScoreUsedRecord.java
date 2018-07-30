@@ -63,7 +63,7 @@ public class UserScoreUsedRecord implements Serializable {
 	/**
 	 * 使用积分
 	 */
-	private int usedscore;
+	private int usedScore;
 	/**
 	 * 创建时间
 	 */

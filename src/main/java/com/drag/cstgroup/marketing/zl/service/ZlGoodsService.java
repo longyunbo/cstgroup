@@ -55,7 +55,7 @@ public class ZlGoodsService {
 	@Autowired
 	private UserTicketDao userTicketDao;
 	@Autowired
-	private ScoreGoodsService dragGoodsService;
+	private ScoreGoodsService scoreGoodsService;
 	@Autowired
 	private UserService userService;
 	@Value("${weixin.url.zl.templateid}")
@@ -101,6 +101,7 @@ public class ZlGoodsService {
 					UserVo userVo = new UserVo();
 					int groupId = pu.getGrouperId();
 					User user = userDao.findOne(groupId);
+					userVo.setCreateTime(DateUtil.format(pu.getCreateTime(), "yyyy-MM-dd HH:mm:ss"));
 					userVo.setCode(pu.getZlcode());
 					if(user != null) {
 						BeanUtils.copyProperties(user, userVo);
@@ -436,7 +437,7 @@ public class ZlGoodsService {
 //						User us = userDao.findOne(user.getUid());
 						String uid = String.valueOf(user.getUid());
 						//新增积分
-						dragGoodsService.addscore(userMap.get(uid),goods.getZlgoodsId(),goods.getZlgoodsName(),Constant.TYPE_ZL,goods.getScore(), goods.getExp());
+						scoreGoodsService.addscore(userMap.get(uid),goods.getZlgoodsId(),goods.getZlgoodsName(),Constant.TYPE_ZL,goods.getScore(), goods.getExp());
 						//给团长发送卡券
 						if(ZlUser.ISHEADER_YES == isHeader) {
 							if(template != null) {

@@ -67,4 +67,9 @@ public class UserVo implements Serializable {
 	 * 拼团，砍价，助力编号
 	 */
 	private String code;
+	/**
+	 * 订单创建时间
+	 */
+	private String createTime;
+	
 }

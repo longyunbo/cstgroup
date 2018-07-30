@@ -26,9 +26,9 @@ import com.drag.cstgroup.user.vo.UserTicketTemplateVo;
 
 @RestController
 @RequestMapping(value = "/chirouosopark/draggoods")
-public class DragGoodsController {
+public class ScoreGoodsController {
 	
-	private final static Logger log = LoggerFactory.getLogger(DragGoodsController.class);
+	private final static Logger log = LoggerFactory.getLogger(ScoreGoodsController.class);
 
 	@Autowired
 	private ScoreGoodsService drGoodsService;

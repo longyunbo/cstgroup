@@ -37,15 +37,15 @@ import lombok.extern.slf4j.Slf4j;
 public class ScoreGoodsService {
 
 	@Autowired
-	private ScoreGoodsDao drGoodsDao;
+	private ScoreGoodsDao scGoodsDao;
 	@Autowired
 	private UserDao userDao;
 	@Autowired
 	private UserTicketService userTicketService;
 	@Autowired
-	private UserScoreRecordDao userDragRecordDao;
+	private UserScoreRecordDao userScoreRecordDao;
 	@Autowired
-	private UserScoreUsedRecordDao userDragUsedRecordDao;
+	private UserScoreUsedRecordDao userScoreUsedRecordDao;
 	@Autowired
 	private UserTicketTemplateDao userTicketTemplateDao;
 
@@ -55,7 +55,7 @@ public class ScoreGoodsService {
 	 */
 	public List<ScoreGoodsVo> listGoods() {
 		List<ScoreGoodsVo> goodsResp = new ArrayList<ScoreGoodsVo>();
-		List<ScoreGoods> goodsList = drGoodsDao.findAll();
+		List<ScoreGoods> goodsList = scGoodsDao.findAll();
 		if (goodsList != null && goodsList.size() > 0) {
 			for (ScoreGoods drgoods : goodsList) {
 				ScoreGoodsVo resp = new ScoreGoodsVo();
@@ -78,7 +78,7 @@ public class ScoreGoodsService {
 	public UserTicketTemplateVo goodsDetail(int goodsId) {
 		UserTicketTemplateVo detailVo = new UserTicketTemplateVo();
 		UserTicketTemplate template = userTicketTemplateDao.findByGoodsIdAndType(goodsId, Constant.TYPE_DR);
-		ScoreGoods dragGoods = drGoodsDao.findGoodsDetail(goodsId);
+		ScoreGoods dragGoods = scGoodsDao.findGoodsDetail(goodsId);
 		BeanUtils.copyProperties(template, detailVo,new String[]{"createTime", "updateTime"});
 		detailVo.setCreateTime((DateUtil.format(dragGoods.getCreateTime(), "yyyy-MM-dd HH:mm:ss")));
 		return detailVo;
@@ -92,10 +92,10 @@ public class ScoreGoodsService {
 	public List<UserScoreUsedRecordVo> listRecord(String openid) {
 		List<UserScoreUsedRecordVo> goodsResp = new ArrayList<UserScoreUsedRecordVo>();
 		User user = userDao.findByOpenid(openid);
-		List<UserScoreUsedRecord> records = userDragUsedRecordDao.findByUidAndType(user.getId(),Constant.TYPE_DR);
+		List<UserScoreUsedRecord> records = userScoreUsedRecordDao.findByUidAndType(user.getId(),Constant.TYPE_DR);
 		for(UserScoreUsedRecord record : records) {
 			UserScoreUsedRecordVo vo = new UserScoreUsedRecordVo();
-			ScoreGoods goods = drGoodsDao.findGoodsDetail(record.getGoodsId()); 
+			ScoreGoods goods = scGoodsDao.findGoodsDetail(record.getGoodsId()); 
 			BeanUtils.copyProperties(record, vo,new String[]{"createTime", "updateTime"});
 			vo.setGoodsName(goods.getGoodsName());
 			vo.setCreateTime((DateUtil.format(record.getCreateTime(), "yyyy-MM-dd HH:mm:ss")));
@@ -110,26 +110,26 @@ public class ScoreGoodsService {
 		User user = userDao.findByOpenid(openid);
 		int uid = user.getId();
 		
-		List<UserScoreUsedRecord> userRecords = userDragUsedRecordDao.findByUid(uid);
+		List<UserScoreUsedRecord> userRecords = userScoreUsedRecordDao.findByUid(uid);
 		if(userRecords != null & userRecords.size() > 0) {
 			for(UserScoreUsedRecord record : userRecords) {
 				UserScoreUsedRecordVo vo = new UserScoreUsedRecordVo();
 				BeanUtils.copyProperties(record, vo,new String[]{"createTime", "updateTime"});
 				vo.setScore(record.getScore());
-				vo.setUsedscore(-record.getUsedscore());
+				vo.setUsedscore(-record.getUsedScore());
 				vo.setGoodsName(record.getGoodsName());
 				vo.setCreateTime((DateUtil.format(record.getCreateTime(), "yyyy-MM-dd HH:mm:ss")));
 				goodsResp.add(vo);
 			}
 		}
 		
-		List<UserScoreRecord> records = userDragRecordDao.findByUid(uid);
+		List<UserScoreRecord> records = userScoreRecordDao.findByUid(uid);
 		if(records != null & records.size() > 0) {
 			for(UserScoreRecord record : records) {
 				UserScoreUsedRecordVo vo = new UserScoreUsedRecordVo();
 				BeanUtils.copyProperties(record, vo,new String[]{"createTime", "updateTime"});
 				vo.setScore(record.getScore());
-				vo.setUsedscore(record.getAvailablescore());
+				vo.setUsedscore(record.getAvailableScore());
 				vo.setGoodsName(record.getGoodsName());
 				vo.setCreateTime((DateUtil.format(record.getCreateTime(), "yyyy-MM-dd HH:mm:ss")));
 				goodsResp.add(vo);
@@ -155,7 +155,7 @@ public class ScoreGoodsService {
 			int score = form.getScore();
 			User user = userDao.findByOpenid(openid);
 			
-			ScoreGoods dragGoods = drGoodsDao.findGoodsDetail(goodsId);
+			ScoreGoods dragGoods = scGoodsDao.findGoodsDetail(goodsId);
 			if(dragGoods == null) {
 				resp.setReturnCode(Constant.PRODUCTNOTEXISTS);
 				resp.setErrorMessage("该商品不存在!");
@@ -242,19 +242,19 @@ public class ScoreGoodsService {
 			}
 			userDao.saveAndFlush(user);
 			//会员积分记录表
-			UserScoreRecord dragRecord = new UserScoreRecord();
-			dragRecord.setId(dragRecord.getId());
-			dragRecord.setUid(user.getId());
-			dragRecord.setGoodsId(goodsId);
-			dragRecord.setGoodsName(goodsName);
-			dragRecord.setType(type);
+			UserScoreRecord scoreRecord = new UserScoreRecord();
+			scoreRecord.setId(scoreRecord.getId());
+			scoreRecord.setUid(user.getId());
+			scoreRecord.setGoodsId(goodsId);
+			scoreRecord.setGoodsName(goodsName);
+			scoreRecord.setType(type);
 			//当前当前积分
-			dragRecord.setScore(nowscore);
+			scoreRecord.setScore(nowscore);
 			//获得积分
-			dragRecord.setAvailablescore(score);
-			dragRecord.setCreateTime(new Timestamp(System.currentTimeMillis()));
+			scoreRecord.setAvailableScore(score);
+			scoreRecord.setCreateTime(new Timestamp(System.currentTimeMillis()));
 			//插入会员积分记录表
-			userDragRecordDao.save(dragRecord);
+			userScoreRecordDao.save(scoreRecord);
 		} catch (Exception e) {
 			log.error("系统异常,{}",e);
 			throw AMPException.getException("系统异常!");
@@ -277,19 +277,19 @@ public class ScoreGoodsService {
 			user.setScore(nowscore);
 			userDao.saveAndFlush(user);
 			//会员积分记录表
-			UserScoreUsedRecord dragRecord = new UserScoreUsedRecord();
-			dragRecord.setId(dragRecord.getId());
-			dragRecord.setUid(user.getId());
-			dragRecord.setGoodsId(goodsId);
-			dragRecord.setGoodsName(goodsName);
-			dragRecord.setType(type);
+			UserScoreUsedRecord scoreRecord = new UserScoreUsedRecord();
+			scoreRecord.setId(scoreRecord.getId());
+			scoreRecord.setUid(user.getId());
+			scoreRecord.setGoodsId(goodsId);
+			scoreRecord.setGoodsName(goodsName);
+			scoreRecord.setType(type);
 			//当前当前积分
-			dragRecord.setScore(nowscore);
+			scoreRecord.setScore(nowscore);
 			//获得积分
-			dragRecord.setUsedscore(score);
-			dragRecord.setCreateTime(new Timestamp(System.currentTimeMillis()));
+			scoreRecord.setUsedScore(score);
+			scoreRecord.setCreateTime(new Timestamp(System.currentTimeMillis()));
 			//插入会员积分使用记录表
-			userDragUsedRecordDao.save(dragRecord);
+			userScoreUsedRecordDao.save(scoreRecord);
 		} catch (Exception e) {
 			log.error("系统异常,{}",e);
 			throw AMPException.getException("系统异常!");
