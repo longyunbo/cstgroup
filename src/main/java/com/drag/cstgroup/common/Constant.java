@@ -24,26 +24,20 @@ public final class Constant {
 
 	//用户不存在
 	public static final String USERNOTEXISTS = "9001";
-	//活动不存在
-	public static final String ACTIVITYNOTEXISTS = "9002";
-	//活动已结束
-	public static final String ACTIVITYALREADYEND_FAIL = "9003";
-	//活动已完成
-	public static final String ACTIVITYALREADYDOWN_FAIL = "9004";
-	//用户已参加活动
-	public static final String USERALREADYIN_FAIL = "9005";
 	//商品不存在
-	public static final String PRODUCTNOTEXISTS = "9006";
+	public static final String PRODUCTNOTEXISTS = "9002";
 	//商品库存不足
-	public static final String STOCK_FAIL = "9007";
+	public static final String STOCK_FAIL = "9003";
+	//订单不存在
+	public static final String ORDERNOTEXISTS = "9002";
 	//卡券不存在
-	public static final String TICKETNOTEXISTS = "9008";
+	public static final String TICKETNOTEXISTS = "9004";
 	//卡券已经被核销
-	public static final String TICKET_DESTORY = "9009";
+	public static final String TICKET_DESTORY = "9005";
 	//卡券已经过期
-	public static final String TICKET_OVER = "9010";
+	public static final String TICKET_OVER = "9006";
 	//用户权限不够
-	public static final String AUTH_OVER = "9011";
+	public static final String AUTH_OVER = "9007";
 	
 	
 }

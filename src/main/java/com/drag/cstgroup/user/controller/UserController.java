@@ -1,7 +1,5 @@
 package com.drag.cstgroup.user.controller;
 
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.drag.cstgroup.user.form.UserForm;
 import com.drag.cstgroup.user.resp.UserResp;
 import com.drag.cstgroup.user.service.UserService;
-import com.drag.cstgroup.user.vo.ActivityVo;
 import com.drag.cstgroup.user.vo.UserVo;
 import com.drag.cstgroup.utils.WxUtil;
 
@@ -75,15 +72,5 @@ public class UserController {
 		return new ResponseEntity<UserResp>(br, HttpStatus.OK);
 	}
 	
-	/**
-	 * 根据openid获取活动
-	 * @param openid
-	 * @return
-	 */
-	@RequestMapping(value = "/queryactivity", method = {RequestMethod.POST,RequestMethod.GET})
-	public @ResponseBody ResponseEntity<List<ActivityVo>> queryActivityByOpenid(@RequestParam(required = true) String openid) {
-		List<ActivityVo> userVo = userService.queryActivityByOpenid(openid);
-		return new ResponseEntity<List<ActivityVo>>(userVo, HttpStatus.OK);
-	}
 	
 }
