@@ -11,12 +11,13 @@ import com.drag.cstgroup.scoremall.entity.ProductInfo;
 import com.drag.cstgroup.scoremall.vo.ProductInfoVo;
 import com.drag.cstgroup.utils.BeanUtils;
 import com.drag.cstgroup.utils.DateUtil;
+import com.drag.cstgroup.utils.StringUtil;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
-public class ProductInfoService {
+public class ProductService {
 
 	@Autowired
 	private ProductInfoDao productDao;
@@ -25,9 +26,19 @@ public class ProductInfoService {
 	 * 查询商品列表
 	 * @return
 	 */
-	public List<ProductInfoVo> listGoods(String type) {
+	public List<ProductInfoVo> listGoods(String type,String orderby) {
+		log.info("【服务类商品列表查询传入参数】type = {},orderby = {}",type,orderby);
 		List<ProductInfoVo> goodsResp = new ArrayList<ProductInfoVo>();
-		List<ProductInfo> goodsList = productDao.findByType(type);
+		List<ProductInfo> goodsList = new ArrayList<ProductInfo>();
+		if(!StringUtil.isEmpty(orderby)) {
+			if("desc".equals(orderby)) {
+				goodsList = productDao.findByTypeOrderByScoreDesc(type);
+			}else {
+				goodsList = productDao.findByTypeOrderByScoreAsc(type);
+			}
+		}else {
+			goodsList = productDao.findByTypeOrderBySuccTimesDesc(type);
+		}
 		if (goodsList != null && goodsList.size() > 0) {
 			for (ProductInfo goods : goodsList) {
 				ProductInfoVo resp = new ProductInfoVo();
@@ -43,6 +54,7 @@ public class ProductInfoService {
 	 * @return
 	 */
 	public ProductInfoVo goodsDetail(int goodsId) {
+		log.info("【服务类商品详情查询传入参数】goodsId = {}",goodsId);
 		ProductInfoVo detailVo = new ProductInfoVo();
 		ProductInfo goods = productDao.findGoodsDetail(goodsId);
 		if(goods != null) {
@@ -71,26 +83,6 @@ public class ProductInfoService {
 		return endFlag;
 	}
 	
-	/**
-	 * 商品减库存
-	 * @param goods
-	 * @param number
-	 * @return
-	 */
-	public Boolean delStock(ProductInfo goods, int number) {
-		boolean flag = false;
-		int goodsNumber = goods.getGoodsNumber();
-		if (goodsNumber - number < 0) {
-			// 库存不足
-			flag = false;
-		} else {
-			flag = true;
-			int nowGoodsNum = goodsNumber - number;
-			goods.setGoodsNumber(nowGoodsNum);
-			productDao.saveAndFlush(goods);
-		}
-		return flag;
-	}
 	
 	/**
 	 * 增加购买次数
@@ -109,11 +101,9 @@ public class ProductInfoService {
 	 * @param detailVo
 	 */
 	public void copyProperties(ProductInfo goods,ProductInfoVo detailVo) {
-		BeanUtils.copyProperties(goods, detailVo,new String[]{"createTime", "updateTime","startTime","endTime"});
+		BeanUtils.copyProperties(goods, detailVo,new String[]{"createTime", "updateTime"});
 		detailVo.setCreateTime((DateUtil.format(goods.getCreateTime(), "yyyy-MM-dd HH:mm:ss")));
 		detailVo.setUpdateTime((DateUtil.format(goods.getUpdateTime(), "yyyy-MM-dd HH:mm:ss")));
-		detailVo.setStartTime((DateUtil.format(goods.getStartTime(), "yyyy-MM-dd HH:mm:ss")));
-		detailVo.setEndTime((DateUtil.format(goods.getEndTime(), "yyyy-MM-dd HH:mm:ss")));
 	}
 	
 }

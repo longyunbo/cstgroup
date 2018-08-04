@@ -13,30 +13,34 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.drag.cstgroup.scoremall.service.ProductInfoService;
+import com.drag.cstgroup.scoremall.service.ProductService;
 import com.drag.cstgroup.scoremall.vo.ProductInfoVo;
 
 
 @RestController
 @RequestMapping(value = "/cstgroup/product", produces = "application/json;charset=utf-8")
-public class ProductInfoController {
+public class ProductController {
 	
-	private final static Logger log = LoggerFactory.getLogger(ProductInfoController.class);
+	private final static Logger log = LoggerFactory.getLogger(ProductController.class);
 
 	@Autowired
-	private ProductInfoService productInfoService;
+	private ProductService productInfoService;
 	
 	/**
 	 * 根据类型查询查询商品
 	 * @return
 	 */
 	@RequestMapping(value = "/listgoods", method = {RequestMethod.POST,RequestMethod.GET})
-	public @ResponseBody ResponseEntity<List<ProductInfoVo>> listGoods(@RequestParam(required = true) String type) {
-		List<ProductInfoVo> rows= productInfoService.listGoods(type);
+	public @ResponseBody ResponseEntity<List<ProductInfoVo>> listGoods(@RequestParam(required = true) String type,@RequestParam String orderby) {
+		List<ProductInfoVo> rows= productInfoService.listGoods(type,orderby);
 		return new ResponseEntity<List<ProductInfoVo>>(rows, HttpStatus.OK);
 	}
 	
-	
+	/**
+	 * 商品详情
+	 * @param goodsId
+	 * @return
+	 */
 	@RequestMapping(value = "/detail", method = {RequestMethod.POST,RequestMethod.GET})
 	public @ResponseBody ResponseEntity<ProductInfoVo> detail(@RequestParam(required = true) int goodsId) {
 		ProductInfoVo detailVo = productInfoService.goodsDetail(goodsId);

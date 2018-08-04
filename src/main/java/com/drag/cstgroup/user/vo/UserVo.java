@@ -1,10 +1,7 @@
 package com.drag.cstgroup.user.vo;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.Date;
-
-import javax.persistence.Id;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -17,20 +14,27 @@ public class UserVo implements Serializable {
 	/**
 	 * id
 	 */
-	@Id
 	private int id;
 	/**
 	 * openid
 	 */
 	private String openid;
 	/**
+	 * 上级编号
+	 */
+	private String parentid;
+	/**
+	 * 用户类型：0-个人，1-企业
+	 */
+	private int type;
+	/**
 	 * 头像
 	 */
 	private String avatar;
 	/**
-	 * 性别
+	 * 性别0-男，1-女
 	 */
-//	private int sex;
+	private int sex;
 	/**
 	 * 昵称
 	 */
@@ -38,11 +42,23 @@ public class UserVo implements Serializable {
 	/**
 	 * 真实姓名
 	 */
-//	private String realname;
+	private String realname;
 	/**
-	 * 年龄
+	 * 生日
 	 */
-//	private int age;
+	private String birthday;
+	/**
+	 * 邮箱
+	 */
+	private String email;
+	/**
+	 * 手机
+	 */
+	private String mobile;
+	/**
+	 * 职业
+	 */
+	private String profession;
 	/**
 	 * 会员等级
 	 */
@@ -52,24 +68,43 @@ public class UserVo implements Serializable {
 	 */
 	private int score;
 	/**
-	 * 经验值
+	 * 余额
 	 */
-	private int exp;
+	private int balance;
 	/**
-	 * 砍价价格（砍价用到的字段）
+	 * 总充值金额
 	 */
-	private BigDecimal price;
+	private int rechargeBalance;
+	
+	//-----------企业信息------------
 	/**
-	 * 购买数量(秒杀用到的字段)
+	 * 企业名称
 	 */
-	private int number;
+	private String companyName;
 	/**
-	 * 拼团，砍价，助力编号
+	 * 企业税号
 	 */
-	private String code;
+	private String dutyParagraph;
 	/**
-	 * 订单创建时间
+	 * 企业地址
+	 */
+	private String companyAddress;
+	/**
+	 * 企业照片
+	 */
+	private String companyImg;
+	/**
+	 * 企业审核状态
+	 */
+	private int checkStatus;
+	//-----------企业信息------------
+	/**
+	 * 创建时间
 	 */
 	private String createTime;
+	/**
+	 * 更新时间
+	 */
+	private String updateTime;
 	
 }

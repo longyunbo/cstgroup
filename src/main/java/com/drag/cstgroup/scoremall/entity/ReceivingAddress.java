@@ -41,7 +41,7 @@ public class ReceivingAddress implements Serializable {
 	/**
 	 * 用户编号
 	 */
-	private String openid;
+	private int uid;
 	/**
 	 * 收货人
 	 */

@@ -53,7 +53,7 @@ public class UserScoreRecord implements Serializable {
 	 */
 	private String goodsName;
 	/**
-	 * 类型:pt-拼团,ms-秒杀,zl-助力,kj-砍价,drag-积分
+	 * 类型:pt-拼团,ms-秒杀,zl-助力,kj-砍价,send-赠送积分,return-下级返回积分,recharge-充值
 	 */
 	private String type;
 	/**

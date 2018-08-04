@@ -37,6 +37,17 @@ public class OrderInfo implements Serializable {
 
 	private static final long serialVersionUID = 8976480717545183113L;
 	
+	// 订单状态0-未付款，1-已付款，2-已退款
+	public static final int ORDERSTATUS_UNPAY = 0;
+	public static final int ORDERSTATUS_SUCCESS = 1;
+	public static final int ORDERSTATUS_RETURN = 2;
+	
+	//发货状态，0：未发货，1：已发货，2：已收货，3：已拒绝
+	public static final int STATUS_UNDELIVERY = 0;
+	public static final int STATUS_SHIPPED = 1;
+	public static final int STATUS_RECEIVED = 2;
+	public static final int STATUS_REFUSED = 2;
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
@@ -49,13 +60,21 @@ public class OrderInfo implements Serializable {
 	 */
 	private String type;
 	/**
+	 * 商品编号(有机食品不需要传，其他的类型需传)
+	 */
+	private int goodsId;
+	/**
+	 * 商品名称
+	 */
+	private String goodsName;
+	/**
 	 * 用户编号
 	 */
-	private String openid;
+	private int uid;
 	/**
 	 * 买家姓名
 	 */
-	private int buyName;
+	private String buyName;
 	/**
 	 * 买家电话
 	 */
@@ -67,7 +86,11 @@ public class OrderInfo implements Serializable {
 	/**
 	 * 消耗积分
 	 */
-	private BigDecimal score;
+	private int score;
+	/**
+	 * 购买规格
+	 */
+	private String norms;
 	/**
 	 * 订单状态，0:已付款,  1:已退款
 	 */
@@ -79,7 +102,7 @@ public class OrderInfo implements Serializable {
 	/**
 	 * 发货状态，0：未发货，1：已发货，2：已收货，3：已拒绝
 	 */
-	private String deliverystatus;
+	private int deliverystatus;
 	/**
 	 * 物流公司名称
 	 */
@@ -117,7 +140,7 @@ public class OrderInfo implements Serializable {
 	 */
 	private String remark;
 	/**
-	 * 是否结束，1，是；0，否
+	 * 是否开票，0-否，1-是
 	 */
 	private int isBilling;
 	/**

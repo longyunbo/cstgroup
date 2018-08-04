@@ -38,6 +38,10 @@ public final class Constant {
 	public static final String TICKET_OVER = "9006";
 	//用户权限不够
 	public static final String AUTH_OVER = "9007";
+	//用户信息不完整
+	public static final String USERINFO_OVER = "9008";
+	//用户积分不足
+	public static final String SCORE_NOTENOUGH = "9009";
 	
 	
 }

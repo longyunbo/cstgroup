@@ -31,23 +31,19 @@ public class ProductInfoVo {
 	/**
 	 * 购买规格
 	 */
-	private int norms;
+	private String norms;
 	/**
 	 * 消耗积分
 	 */
-	private BigDecimal score;
-	/**
-	 * 开始时间
-	 */
-	private String startTime;
-	/**
-	 * 结束时间
-	 */
-	private String endTime;
-	/**
-	 * 商品库存数量
-	 */
-	private int goodsNumber;
+	private int score;
+//	/**
+//	 * 开始时间
+//	 */
+//	private String startTime;
+//	/**
+//	 * 结束时间
+//	 */
+//	private String endTime;
 	/**
 	 * 商品剪短描述
 	 */

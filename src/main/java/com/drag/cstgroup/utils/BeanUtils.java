@@ -10,6 +10,8 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.FatalBeanException;
 import org.springframework.util.Assert;
 
+import lombok.extern.slf4j.Slf4j;
+@Slf4j
 public abstract class BeanUtils extends org.springframework.beans.BeanUtils {
 
 	/**
@@ -78,6 +80,7 @@ public abstract class BeanUtils extends org.springframework.beans.BeanUtils {
 							writeMethod.invoke(target, value);
 						}
 					} catch (Throwable ex) {
+						log.error("【------errorSourcePd-------】:{}",sourcePd.getReadMethod());
 						throw new FatalBeanException("Could not copy properties from source to target", ex);
 					}
 				}

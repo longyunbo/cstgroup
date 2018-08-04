@@ -28,6 +28,15 @@ import lombok.NoArgsConstructor;
 public class User implements Serializable {
 
 	private static final long serialVersionUID = 8262803439444253531L;
+	//企业审核状态:0-审核中，1-审核通过，2-审核不通过
+	public final static int CHECKSTATUS_MID = 0;
+	public final static int CHECKSTATUS_YES = 1;
+	public final static int CHECKSTATUS_NO = 2;
+	//性别
+	public final static int SEX_MALE = 0;
+	public final static int SEX_FEMALE = 1;
+	
+	
 	/**
 	 * id
 	 */
@@ -38,11 +47,19 @@ public class User implements Serializable {
 	 */
 	private String openid;
 	/**
+	 * 上级编号
+	 */
+	private String parentid;
+	/**
+	 * 用户类型：0-个人，1-企业
+	 */
+	private int type;
+	/**
 	 * 头像
 	 */
 	private String avatar;
 	/**
-	 * 性别
+	 * 性别0-男，1-女
 	 */
 	private int sex;
 	/**
@@ -56,7 +73,7 @@ public class User implements Serializable {
 	/**
 	 * 生日
 	 */
-	private Date birthday;
+	private String birthday;
 	/**
 	 * 邮箱
 	 */
@@ -66,9 +83,9 @@ public class User implements Serializable {
 	 */
 	private String mobile;
 	/**
-	 * 年龄
+	 * 职业
 	 */
-	private int age;
+	private String profession;
 	/**
 	 * 会员等级
 	 */
@@ -78,12 +95,43 @@ public class User implements Serializable {
 	 */
 	private int score;
 	/**
-	 * 经验值
+	 * 余额
 	 */
-	private int exp;
+	private int balance;
+	/**
+	 * 总充值金额
+	 */
+	private int rechargeBalance;
+	
+	//-----------企业信息------------
+	/**
+	 * 企业名称
+	 */
+	private String companyName;
+	/**
+	 * 企业税号
+	 */
+	private String dutyParagraph;
+	/**
+	 * 企业地址
+	 */
+	private String companyAddress;
+	/**
+	 * 企业照片
+	 */
+	private String companyImg;
+	/**
+	 * 企业审核状态
+	 */
+	private int checkStatus;
+	//-----------企业信息------------
 	/**
 	 * 创建时间
 	 */
 	private Date createTime;
+	/**
+	 * 更新时间
+	 */
+	private Date updateTime;
 
 }

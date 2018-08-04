@@ -20,6 +20,9 @@ public interface ProductInfoDao extends JpaRepository<ProductInfo, String>, JpaS
 	@Query(value = "select * from t_product_info where goods_id in (?1)", nativeQuery = true)
 	List<ProductInfo> findByIdIn(Set<Integer> msIds);
 	
-	@Query(value = "select * from t_product_info where type = ?1", nativeQuery = true)
 	List<ProductInfo> findByType(String type);
+	List<ProductInfo> findByTypeOrderByScoreDesc(String type);
+	List<ProductInfo> findByTypeOrderByScoreAsc(String type);
+	List<ProductInfo> findByTypeOrderBySuccTimesDesc(String type);
+	
 }

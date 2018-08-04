@@ -22,11 +22,11 @@ public class OrderDetailForm {
 	/**
 	 * 用户编号
 	 */
-	private String openid;
+//	private String openid;
 	/**
 	 * 购买规格
 	 */
-	private int norms;
+	private String norms;
 	/**
 	 * 商品数量
 	 */
@@ -34,10 +34,10 @@ public class OrderDetailForm {
 	/**
 	 * 消耗积分
 	 */
-	private BigDecimal score;
-	/**
-	 * 支付积分(数量*消耗积分)
-	 */
-	private BigDecimal payScore;
+	private int score;
+//	/**
+//	 * 支付积分(数量*消耗积分)
+//	 */
+//	private BigDecimal payScore;
 
 }

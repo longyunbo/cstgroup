@@ -34,6 +34,12 @@ import lombok.NoArgsConstructor;
 public class ProductInfo implements Serializable {
 
 	private static final long serialVersionUID = 5881992527238032246L;
+	
+	public static final String TYPE_YJ = "yj";
+	public static final String TYPE_LY = "ly";
+	public static final String TYPE_QY = "qy";
+	public static final String TYPE_TC = "tc";
+	
 	/**
 	 * 商品自增id
 	 */
@@ -50,15 +56,11 @@ public class ProductInfo implements Serializable {
 	/**
 	 * 购买规格
 	 */
-	private int norms;
+	private String norms;
 	/**
 	 * 消耗积分
 	 */
-	private BigDecimal score;
-	/**
-	 * 商品库存数量
-	 */
-	private int goodsNumber;
+	private int score;
 	/**
 	 * 商品剪短描述
 	 */
@@ -83,14 +85,14 @@ public class ProductInfo implements Serializable {
 	 * 该商品显示顺序（越大越靠后）
 	 */
 	private int sort;
-	/**
-	 * 开始时间
-	 */
-	private Date startTime;
-	/**
-	 * 结束时间
-	 */
-	private Date endTime;
+//	/**
+//	 * 开始时间
+//	 */
+//	private Date startTime;
+//	/**
+//	 * 结束时间
+//	 */
+//	private Date endTime;
 	/**
 	 * 创建时间
 	 */

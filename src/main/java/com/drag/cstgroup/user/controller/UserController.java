@@ -20,24 +20,13 @@ import com.drag.cstgroup.utils.WxUtil;
 
 
 @RestController
-@RequestMapping(value = "/chirouosopark/user")
+@RequestMapping(value = "/cstgroup/user")
 public class UserController {
 	
 	private final static Logger log = LoggerFactory.getLogger(UserController.class);
 
 	@Autowired
 	private UserService userService;
-	
-	/**
-	 * 查询用户权限
-	 * @return
-	 */
-//	@RequestMapping(value = "/checkauth", method = {RequestMethod.POST,RequestMethod.GET})
-//	public @ResponseBody ResponseEntity<Boolean> checkAuth(@RequestParam(required = true) String openid) {
-//		Boolean auth = false;
-//		auth = userService.checkAuth(openid);
-//		return new ResponseEntity<Boolean>(auth, HttpStatus.OK);
-//	}
 	
 	/**
 	 * 根据code获取openid
@@ -72,5 +61,14 @@ public class UserController {
 		return new ResponseEntity<UserResp>(br, HttpStatus.OK);
 	}
 	
-	
+	/**
+	 * 完善用户
+	 * @param form
+	 * @return
+	 */
+	@RequestMapping(value = "/userupdate", method = {RequestMethod.POST,RequestMethod.GET})
+	public @ResponseBody ResponseEntity<UserResp> userUpdate(@RequestBody UserForm form) {
+		UserResp br = userService.userUpdate(form);
+		return new ResponseEntity<UserResp>(br, HttpStatus.OK);
+	}
 }

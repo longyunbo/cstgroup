@@ -58,11 +58,11 @@ public class OrderDetail implements Serializable {
 	/**
 	 * 用户编号
 	 */
-	private String openid;
+	private int uid;
 	/**
 	 * 购买规格
 	 */
-	private int norms;
+	private String norms;
 	/**
 	 * 商品数量
 	 */
@@ -70,11 +70,20 @@ public class OrderDetail implements Serializable {
 	/**
 	 * 消耗积分
 	 */
-	private BigDecimal score;
+	private int score;
 	/**
-	 * 支付积分(数量*消耗积分)
+	 * 创建时间
 	 */
-	private BigDecimal payScore;
+	private Date createTime;
+	/**
+	 * 修改时间
+	 */
+	private Date updateTime;
+	
+//	/**
+//	 * 支付积分(数量*消耗积分)
+//	 */
+//	private int payScore;
 	
 
 }

@@ -1,5 +1,6 @@
 package com.drag.cstgroup.scoremall.form;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import lombok.Data;
@@ -20,6 +21,14 @@ public class OrderInfoForm {
 	 */
 	private String type;
 	/**
+	 * 商品编号(有机食品不需要传，其他的类型需传)
+	 */
+	private int goodsId;
+	/**
+	 * 商品名称
+	 */
+	private String goodsName;
+	/**
 	 * 总数量
 	 */
 	private int number;
@@ -28,7 +37,23 @@ public class OrderInfoForm {
 	 */
 	private int score;
 	/**
-	 * 开票类型
+	 * 规格
+	 */
+	private String norms;
+	/**
+	 * 买家姓名
+	 */
+	private String buyName;
+	/**
+	 * 买家手机号
+	 */
+	private String phone;
+	/**
+	 * 是否开票，0-否，1-是
+	 */
+	private int isBilling;
+	/**
+	 * 0-个人，1-公司
 	 */
 	private String billingType;
 	/**
@@ -42,7 +67,7 @@ public class OrderInfoForm {
 	/**
 	 * 订单方式（0:快递到家，1:送货上门）
 	 */
-	private String orderType;
+	private int orderType;
 	/**
 	 * 收货人
 	 */
@@ -62,7 +87,7 @@ public class OrderInfoForm {
 	/**
 	 * 地址
 	 */
-	private String address;
+	private String receiptAddress;
 	/**
 	 * formId
 	 */
