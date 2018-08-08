@@ -11,7 +11,7 @@ import com.drag.cstgroup.user.entity.User;
 public interface UserDao extends JpaRepository<User, String>, JpaSpecificationExecutor<User> {
 
 	@Query(value = "select * from t_user where id = ?1 ", nativeQuery = true)
-	User findOne(int id);
+	User findById(int id);
 	
 	@Query(value = "select * from t_user where openid = ?1 ", nativeQuery = true)
 	User findByOpenid(String openid);

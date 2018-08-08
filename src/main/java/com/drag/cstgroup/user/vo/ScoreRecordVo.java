@@ -17,6 +17,10 @@ public class ScoreRecordVo{
 	 */
 	private int uid;
 	/**
+	 * 对方编号
+	 */
+	private int fuid;
+	/**
 	 * 商品编号
 	 */
 	private int goodsId;
@@ -25,7 +29,7 @@ public class ScoreRecordVo{
 	 */
 	private String goodsName;
 	/**
-	 * send-赠送积分,return-下级返回积分,recharge-充值,
+	 * return-下级返回积分,recharge-充值,
 	 * yj-有机食品,ly-旅游服务,qy-企业服务,tc-营养套餐，send-赠送积分
 	 */
 	private String type;

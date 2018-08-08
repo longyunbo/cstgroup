@@ -1,6 +1,8 @@
 package com.drag.cstgroup.user.service;
 
+import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.util.List;
 
 import javax.transaction.Transactional;
 
@@ -11,8 +13,10 @@ import com.alibaba.fastjson.JSON;
 import com.drag.cstgroup.common.Constant;
 import com.drag.cstgroup.common.exception.AMPException;
 import com.drag.cstgroup.user.dao.UserDao;
+import com.drag.cstgroup.user.dao.UserProfessionDao;
 import com.drag.cstgroup.user.dao.UserRankLevelDao;
 import com.drag.cstgroup.user.entity.User;
+import com.drag.cstgroup.user.entity.UserProfession;
 import com.drag.cstgroup.user.entity.UserRankLevel;
 import com.drag.cstgroup.user.form.UserForm;
 import com.drag.cstgroup.user.resp.UserResp;
@@ -30,6 +34,8 @@ public class UserService {
 	private UserDao userDao;
 	@Autowired
 	private UserRankLevelDao userRankLevelDao;
+	@Autowired
+	private UserProfessionDao userProfessionDao;
 
 	/**
 	 * 检查权限
@@ -81,9 +87,14 @@ public class UserService {
 				user.setCheckStatus(User.CHECKSTATUS_MID);
 			}
 			BeanUtils.copyProperties(form, user,new String[]{"createTime", "updateTime"});
+			int uid = user.getId();
+			user.setId(uid);
 			user.setCreateTime(new Timestamp(System.currentTimeMillis()));
 			user.setRankLevel(0);
+			user.setBalance(BigDecimal.ZERO);
+			user.setScore(0);
 			userDao.save(user);
+			
 			baseResp.setReturnCode(Constant.SUCCESS);
 			baseResp.setErrorMessage("新增用户成功!");
 		} catch (Exception e) {
@@ -128,6 +139,7 @@ public class UserService {
 	 * @return
 	 */
 	public UserVo queryUserByOpenid(String openid) {
+		log.info("【根据openid获取用户信息】openid = {}",openid);
 		UserVo userVo = new UserVo();
 		try {
 			User user = userDao.findByOpenid(openid);
@@ -142,6 +154,18 @@ public class UserService {
 		return userVo;
 	}
 	
+	/**
+	 * 查询职业
+	 * @return
+	 */
+	public List<UserProfession> queryProfession() {
+		List<UserProfession> resp = userProfessionDao.findAll();
+		return resp;
+	}
+	
+	
+	
 	
 	
 }
+

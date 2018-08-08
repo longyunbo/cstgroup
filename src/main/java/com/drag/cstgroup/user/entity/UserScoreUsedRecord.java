@@ -33,6 +33,11 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper=false)
 public class UserScoreUsedRecord implements Serializable {
 
+	// 积分来源类型:pt-拼团,ms-秒杀,zl-助力,kj-砍价,send-赠送积分,return-下级返回积分,recharge-充值,buy-积分购买
+	public static String TYPE_RECHARGE = "recharge";
+	public static String TYPE_RETURN = "return";
+	public static String TYPE_SEND = "send";
+	
 	private static final long serialVersionUID = -8720698126498205667L;
 	/**
 	 * id
@@ -44,6 +49,10 @@ public class UserScoreUsedRecord implements Serializable {
 	 * 用户编号
 	 */
 	private int uid;
+	/**
+	 * 对方用户编号
+	 */
+	private int fuid;
 	/**
 	 * 商品编号
 	 */

@@ -1,7 +1,5 @@
 package com.drag.cstgroup.scoremall.vo;
 
-import java.math.BigDecimal;
-
 import javax.persistence.Id;
 
 import lombok.Data;

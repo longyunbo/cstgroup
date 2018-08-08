@@ -1,6 +1,7 @@
 package com.drag.cstgroup.scoremall.service;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -20,10 +21,13 @@ import com.drag.cstgroup.scoremall.entity.ProductInfo;
 import com.drag.cstgroup.scoremall.form.OrderDetailForm;
 import com.drag.cstgroup.scoremall.form.OrderInfoForm;
 import com.drag.cstgroup.scoremall.resp.OrderResp;
+import com.drag.cstgroup.scoremall.vo.OrderInfoVo;
 import com.drag.cstgroup.user.dao.UserDao;
 import com.drag.cstgroup.user.dao.UserScoreUsedRecordDao;
 import com.drag.cstgroup.user.entity.User;
 import com.drag.cstgroup.user.entity.UserScoreUsedRecord;
+import com.drag.cstgroup.utils.BeanUtils;
+import com.drag.cstgroup.utils.DateUtil;
 import com.drag.cstgroup.utils.StringUtil;
 
 import lombok.extern.slf4j.Slf4j;
@@ -65,13 +69,13 @@ public class OrderService {
 			String buyName = form.getBuyName();
 			String phone = form.getPhone();
 			//是否开票
-			int isBilling = form.getIsBilling();
-			//开票类型
-			String billingType = form.getBillingType();
-			//开票抬头
-			String invPayee = form.getInvPayee();
-			//发票内容
-			String invContent = form.getInvContent();
+//			int isBilling = form.getIsBilling();
+//			//开票类型
+//			String billingType = form.getBillingType();
+//			//开票抬头
+//			String invPayee = form.getInvPayee();
+//			//发票内容
+//			String invContent = form.getInvContent();
 			//订单方式（0:快递到家，1:送货上门）
 			int orderType = form.getOrderType();
 			//收货人
@@ -100,6 +104,7 @@ public class OrderService {
 			order.setOrderid(orderid);
 			order.setGoodsId(goodsId);
 			order.setGoodsName(goodsName + "等商品");
+			order.setGoodsImg(goods.getGoodsImgs());
 			order.setType(type);
 			order.setNumber(number);
 			order.setScore(score);
@@ -115,29 +120,13 @@ public class OrderService {
 			order.setRegion(region);
 			order.setPostalcode(postalcode);
 			order.setReceiptAddress(receiptAddress);
-			order.setIsBilling(isBilling);
-			order.setBillingType(billingType);
-			order.setInvPayee(invPayee);
-			order.setInvContent(invContent);
-			
+//			order.setIsBilling(isBilling);
+//			order.setBillingType(billingType);
+//			order.setInvPayee(invPayee);
+//			order.setInvContent(invContent);
 			order.setCreateTime(new Timestamp(System.currentTimeMillis()));
 			order.setUpdateTime(new Timestamp(System.currentTimeMillis()));
 			orderInfoDao.save(order);
-			
-			int nowScore = user.getScore();
-			//新增积分使用记录
-			UserScoreUsedRecord scoreUsedRecord = new UserScoreUsedRecord();
-			scoreUsedRecord.setId(scoreUsedRecord.getId());
-			scoreUsedRecord.setUid(uid);
-			scoreUsedRecord.setGoodsId(goodsId);
-			scoreUsedRecord.setGoodsName(goodsName + "等商品");
-			scoreUsedRecord.setType(type);
-			scoreUsedRecord.setScore(nowScore);
-			scoreUsedRecord.setUsedScore(score);
-			scoreUsedRecord.setCreateTime(new Timestamp(System.currentTimeMillis()));
-			userScoreUsedRecordDao.save(scoreUsedRecord);
-			//新增购买人数次数
-			this.addSuccTimes(goods);
 			
 			List<OrderDetailForm> orderList = form.getOrderDetail();
 			if(orderList != null && orderList.size() > 0) {
@@ -168,11 +157,27 @@ public class OrderService {
 				log.error("【有机类商品下单订单参数错误】,{}",JSON.toJSONString(orderList));
 				return resp;
 			}
+			
+			int nowScore = user.getScore();
+			//新增积分使用记录
+			UserScoreUsedRecord scoreUsedRecord = new UserScoreUsedRecord();
+			scoreUsedRecord.setId(scoreUsedRecord.getId());
+			scoreUsedRecord.setUid(uid);
+			scoreUsedRecord.setGoodsId(goodsId);
+			scoreUsedRecord.setGoodsName(goodsName + "等商品");
+			scoreUsedRecord.setType(type);
+			scoreUsedRecord.setScore(nowScore);
+			scoreUsedRecord.setUsedScore(score);
+			scoreUsedRecord.setCreateTime(new Timestamp(System.currentTimeMillis()));
+			userScoreUsedRecordDao.save(scoreUsedRecord);
+			//新增购买人数次数
+			this.addSuccTimes(goods);
+			
 			resp.setReturnCode(Constant.SUCCESS);
 			resp.setErrorMessage("下单成功!");
 		} catch (Exception e) {
 			log.error("系统异常,{}",e);
-			throw AMPException.getException("系统异常!");
+			throw AMPException.getException("下单异常!");
 		}
 		return resp;
 	}
@@ -204,14 +209,14 @@ public class OrderService {
 			String buyName = form.getBuyName();
 			String phone = form.getPhone();
 			
-			//是否开票
-			int isBilling = form.getIsBilling();
-			//开票类型
-			String billingType = form.getBillingType();
-			//开票抬头
-			String invPayee = form.getInvPayee();
-			//发票内容
-			String invContent = form.getInvContent();
+//			//是否开票
+//			int isBilling = form.getIsBilling();
+//			//开票类型
+//			String billingType = form.getBillingType();
+//			//开票抬头
+//			String invPayee = form.getInvPayee();
+//			//发票内容
+//			String invContent = form.getInvContent();
 			
 			
 			User user = userDao.findByOpenid(openid);
@@ -229,6 +234,7 @@ public class OrderService {
 			order.setOrderid(orderid);
 			order.setGoodsId(goodsId);
 			order.setGoodsName(goodsName);
+			order.setGoodsImg(goods.getGoodsImgs());
 			order.setType(type);
 			order.setNumber(number);
 			order.setScore(score);
@@ -238,10 +244,10 @@ public class OrderService {
 			order.setBuyName(buyName);
 			order.setPhone(phone);
 			order.setNorms(norms);
-			order.setIsBilling(isBilling);
-			order.setBillingType(billingType);
-			order.setInvPayee(invPayee);
-			order.setInvContent(invContent);
+//			order.setIsBilling(isBilling);
+//			order.setBillingType(billingType);
+//			order.setInvPayee(invPayee);
+//			order.setInvContent(invContent);
 			order.setCreateTime(new Timestamp(System.currentTimeMillis()));
 			orderInfoDao.save(order);
 			int nowScore = user.getScore();
@@ -265,6 +271,29 @@ public class OrderService {
 		resp.setReturnCode(Constant.SUCCESS);
 		resp.setErrorMessage("下单成功!");
 		return resp;
+	}
+	
+	/**
+	 * 获取个人订单
+	 * @param openid
+	 * @return
+	 */
+	public List<OrderInfoVo> myOrders(String openid){
+		log.info("【我的订单传入参数】:{}", openid);
+		List<OrderInfoVo> orderResp = new ArrayList<OrderInfoVo>();
+		User user = userDao.findByOpenid(openid);
+		int uid = user.getId();
+		if(user != null) {
+			List<OrderInfo> orderList = orderInfoDao.findByUid(uid);
+			for (OrderInfo order : orderList) {
+				OrderInfoVo vo = new OrderInfoVo();
+				BeanUtils.copyProperties(order, vo,new String[]{"createTime", "updateTime"});
+				vo.setCreateTime((DateUtil.format(order.getCreateTime(), "yyyy-MM-dd HH:mm:ss")));
+				vo.setUpdateTime((DateUtil.format(order.getUpdateTime(), "yyyy-MM-dd HH:mm:ss")));
+				orderResp.add(vo);
+			}
+		}
+		return orderResp;
 	}
 	
 	/**

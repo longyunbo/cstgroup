@@ -1,9 +1,12 @@
 package com.drag.cstgroup.user.entity;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -41,6 +44,7 @@ public class User implements Serializable {
 	 * id
 	 */
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 	/**
 	 * openid
@@ -49,7 +53,7 @@ public class User implements Serializable {
 	/**
 	 * 上级编号
 	 */
-	private String parentid;
+	private int parentid;
 	/**
 	 * 用户类型：0-个人，1-企业
 	 */
@@ -97,7 +101,7 @@ public class User implements Serializable {
 	/**
 	 * 余额
 	 */
-	private int balance;
+	private BigDecimal balance;
 	/**
 	 * 总充值金额
 	 */

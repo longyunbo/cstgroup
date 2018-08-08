@@ -42,6 +42,8 @@ public final class Constant {
 	public static final String USERINFO_OVER = "9008";
 	//用户积分不足
 	public static final String SCORE_NOTENOUGH = "9009";
+	//用户余额不足
+	public static final String MONEY_NOTENOUGH = "9010";
 	
 	
 }

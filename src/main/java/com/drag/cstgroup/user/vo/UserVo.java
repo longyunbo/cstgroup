@@ -1,6 +1,7 @@
 package com.drag.cstgroup.user.vo;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 import lombok.Data;
@@ -70,7 +71,7 @@ public class UserVo implements Serializable {
 	/**
 	 * 余额
 	 */
-	private int balance;
+	private BigDecimal balance;
 	/**
 	 * 总充值金额
 	 */

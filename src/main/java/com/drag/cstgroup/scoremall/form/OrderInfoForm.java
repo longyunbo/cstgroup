@@ -1,6 +1,5 @@
 package com.drag.cstgroup.scoremall.form;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import lombok.Data;
