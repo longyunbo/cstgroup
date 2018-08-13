@@ -63,7 +63,7 @@ public class User implements Serializable {
 	 */
 	private String avatar;
 	/**
-	 * 性别0-男，1-女
+	 * 性别0-女，1-男
 	 */
 	private int sex;
 	/**
@@ -74,6 +74,14 @@ public class User implements Serializable {
 	 * 真实姓名
 	 */
 	private String realname;
+	/**
+	 * 客如云顾客ID
+	 */
+	private String customerId;
+	/**
+	 * 客如云顾客主ID
+	 */
+	private String customerMainId;
 	/**
 	 * 生日
 	 */
@@ -91,6 +99,10 @@ public class User implements Serializable {
 	 */
 	private String profession;
 	/**
+	 * 职位
+	 */
+	private String job;
+	/**
 	 * 会员等级
 	 */
 	private int rankLevel;
@@ -102,6 +114,10 @@ public class User implements Serializable {
 	 * 余额
 	 */
 	private BigDecimal balance;
+	/**
+	 * 赠送余额
+	 */
+	private BigDecimal extraBalance;
 	/**
 	 * 总充值金额
 	 */

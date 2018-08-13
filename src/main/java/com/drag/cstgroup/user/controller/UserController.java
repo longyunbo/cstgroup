@@ -65,7 +65,18 @@ public class UserController {
 	}
 	
 	/**
-	 * 完善用户
+	 * 完善用户（需调用客如云创建用户接口）
+	 * @param form
+	 * @return
+	 */
+	@RequestMapping(value = "/usersupply", method = {RequestMethod.POST,RequestMethod.GET})
+	public @ResponseBody ResponseEntity<UserResp> userSupply(@RequestBody UserForm form) {
+		UserResp br = userService.createCustomer(form);
+		return new ResponseEntity<UserResp>(br, HttpStatus.OK);
+	}
+	
+	/**
+	 * 更新用户
 	 * @param form
 	 * @return
 	 */
@@ -85,6 +96,28 @@ public class UserController {
 		return new ResponseEntity<List<UserProfession>>(br, HttpStatus.OK);
 	}
 	
+	/**
+	 * 查询父级用户
+	 * @param parentid
+	 * @return
+	 */
+	@RequestMapping(value = "/myparent", method = {RequestMethod.POST,RequestMethod.GET})
+	public @ResponseBody ResponseEntity<UserVo> queryUserByParent(@RequestParam(required = true) int parentid) {
+		UserVo userVo = userService.queryUserByParent(parentid);
+		return new ResponseEntity<UserVo>(userVo, HttpStatus.OK);
+	}
+	
+	
+	/**
+	 * 根据openid获取用户下级信息
+	 * @param openid
+	 * @return
+	 */
+	@RequestMapping(value = "/mychidren", method = {RequestMethod.POST,RequestMethod.GET})
+	public @ResponseBody ResponseEntity<List<UserVo>> queryChidrenUser(@RequestParam(required = true) int uid) {
+		List<UserVo> userVo = userService.queryChidrenUser(uid);
+		return new ResponseEntity<List<UserVo>>(userVo, HttpStatus.OK);
+	}
 	
 	
 }

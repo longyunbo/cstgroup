@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import com.alibaba.fastjson.JSON;
 import com.drag.cstgroup.common.Constant;
 import com.drag.cstgroup.common.exception.AMPException;
+import com.drag.cstgroup.keruyun.service.KeruyunService;
 import com.drag.cstgroup.scoremall.dao.OrderDetailDao;
 import com.drag.cstgroup.scoremall.dao.OrderInfoDao;
 import com.drag.cstgroup.scoremall.dao.ProductInfoDao;
@@ -26,6 +27,7 @@ import com.drag.cstgroup.user.dao.UserDao;
 import com.drag.cstgroup.user.dao.UserScoreUsedRecordDao;
 import com.drag.cstgroup.user.entity.User;
 import com.drag.cstgroup.user.entity.UserScoreUsedRecord;
+import com.drag.cstgroup.user.service.ScoreService;
 import com.drag.cstgroup.utils.BeanUtils;
 import com.drag.cstgroup.utils.DateUtil;
 import com.drag.cstgroup.utils.StringUtil;
@@ -46,6 +48,10 @@ public class OrderService {
 	private ProductInfoDao productInfoDao;
 	@Autowired
 	private UserScoreUsedRecordDao userScoreUsedRecordDao;
+	@Autowired
+	private ScoreService scoreService;
+	@Autowired
+	private KeruyunService keruyunService;
 	
 	/**
 	 * 有机食品购买下单
@@ -91,90 +97,105 @@ public class OrderService {
 			//消耗总积分
 			User user = userDao.findByOpenid(openid);
 			ProductInfo goods = productInfoDao.findGoodsDetail(goodsId);
-			int uid = user.getId();
-			//验证参数
-			resp = this.checkParam(user,goods,form);
-			String returnCode = resp.getReturnCode();
-			if(!returnCode.equals(Constant.SUCCESS)) {
-				return resp;
-			}
-			//插入订单表
-			OrderInfo order = new OrderInfo();
-			order.setId(order.getId());
-			order.setOrderid(orderid);
-			order.setGoodsId(goodsId);
-			order.setGoodsName(goodsName + "等商品");
-			order.setGoodsImg(goods.getGoodsImgs());
-			order.setType(type);
-			order.setNumber(number);
-			order.setScore(score);
-			//已付款,包含了减积分逻辑
-			order.setOrderstatus(OrderInfo.ORDERSTATUS_SUCCESS);
-			order.setUid(uid);
-			order.setBuyName(buyName);
-			order.setPhone(phone);
-			order.setOrderType(orderType);
-			order.setDeliverystatus(OrderInfo.STATUS_UNDELIVERY);
-			order.setReceiptName(receiptName);
-			order.setReceiptTel(receiptTel);
-			order.setRegion(region);
-			order.setPostalcode(postalcode);
-			order.setReceiptAddress(receiptAddress);
+			if(user != null) {
+				int uid = user.getId();
+				//验证参数
+				resp = this.checkParam(user,goods,form);
+				String returnCode = resp.getReturnCode();
+				if(!returnCode.equals(Constant.SUCCESS)) {
+					return resp;
+				}
+				//插入订单表
+				OrderInfo order = new OrderInfo();
+				order.setId(order.getId());
+				order.setOrderid(orderid);
+				order.setGoodsId(goodsId);
+				order.setGoodsName(goodsName + "等商品");
+				order.setGoodsImg(goods.getGoodsImgs());
+				order.setType(type);
+				order.setNumber(number);
+				order.setScore(score);
+				//已付款,包含了减积分逻辑
+				order.setOrderstatus(OrderInfo.ORDERSTATUS_SUCCESS);
+				order.setUid(uid);
+				order.setBuyName(buyName);
+				order.setPhone(phone);
+				order.setOrderType(orderType);
+				order.setDeliverystatus(OrderInfo.STATUS_UNDELIVERY);
+				order.setReceiptName(receiptName);
+				order.setReceiptTel(receiptTel);
+				order.setRegion(region);
+				order.setPostalcode(postalcode);
+				order.setReceiptAddress(receiptAddress);
 //			order.setIsBilling(isBilling);
 //			order.setBillingType(billingType);
 //			order.setInvPayee(invPayee);
 //			order.setInvContent(invContent);
-			order.setCreateTime(new Timestamp(System.currentTimeMillis()));
-			order.setUpdateTime(new Timestamp(System.currentTimeMillis()));
-			orderInfoDao.save(order);
-			
-			List<OrderDetailForm> orderList = form.getOrderDetail();
-			if(orderList != null && orderList.size() > 0) {
-				for(OrderDetailForm detail : orderList) {
-					//插入订单详情
-					int dGoodsId = detail.getGoodsId();
-					String dGoodsName = detail.getGoodsName();
-					String dNorms = detail.getNorms();
-					int dNumber = detail.getNumber();
-					int dScore  = detail.getScore();
-					OrderDetail orderDetail = new OrderDetail();
-					orderDetail.setId(orderDetail.getId());
-					orderDetail.setUid(uid);
-					orderDetail.setOrderid(orderid);
-					orderDetail.setGoodsId(dGoodsId);
-					orderDetail.setGoodsName(dGoodsName);
-					orderDetail.setNorms(dNorms);
-					orderDetail.setScore(dScore);
-					orderDetail.setNumber(dNumber);
-					orderDetail.setType(type);
-					orderDetail.setCreateTime(new Timestamp(System.currentTimeMillis()));
-					orderDetail.setUpdateTime(new Timestamp(System.currentTimeMillis()));
-					orderDetailDao.save(orderDetail);
+				order.setCreateTime(new Timestamp(System.currentTimeMillis()));
+				order.setUpdateTime(new Timestamp(System.currentTimeMillis()));
+				orderInfoDao.save(order);
+				
+				List<OrderDetailForm> orderList = form.getOrderDetail();
+				if(orderList != null && orderList.size() > 0) {
+					for(OrderDetailForm detail : orderList) {
+						//插入订单详情
+						int dGoodsId = detail.getGoodsId();
+						String dGoodsName = detail.getGoodsName();
+						String dNorms = detail.getNorms();
+						int dNumber = detail.getNumber();
+						int dScore  = detail.getScore();
+						OrderDetail orderDetail = new OrderDetail();
+						orderDetail.setId(orderDetail.getId());
+						orderDetail.setUid(uid);
+						orderDetail.setOrderid(orderid);
+						orderDetail.setGoodsId(dGoodsId);
+						orderDetail.setGoodsName(dGoodsName);
+						orderDetail.setNorms(dNorms);
+						orderDetail.setScore(dScore);
+						orderDetail.setNumber(dNumber);
+						orderDetail.setType(type);
+						orderDetail.setCreateTime(new Timestamp(System.currentTimeMillis()));
+						orderDetail.setUpdateTime(new Timestamp(System.currentTimeMillis()));
+						orderDetailDao.save(orderDetail);
+					}
+				}else {
+					resp.setReturnCode(Constant.ORDERNOTEXISTS);
+					resp.setErrorMessage("订单详情不存在，请添加商品!");
+					log.error("【有机类商品下单订单参数错误】,{}",JSON.toJSONString(orderList));
+					return resp;
 				}
-			}else {
-				resp.setReturnCode(Constant.ORDERNOTEXISTS);
-				resp.setErrorMessage("订单详情不存在，请添加商品!");
-				log.error("【有机类商品下单订单参数错误】,{}",JSON.toJSONString(orderList));
-				return resp;
+				
+				int nowScore = user.getScore();
+				
+				//客如云扣减积分
+				String customerId = user.getCustomerId();
+				String remark = String.format("%s购买%s",customerId,goodsName + "等商品");
+				keruyunService.cutScore(customerId, score,remark);
+				
+				//给上级返积分
+				int parentid = user.getParentid();
+				if(parentid != 0) {
+					scoreService.returnScore(parentid, score);
+				}
+				
+				//新增积分使用记录
+				UserScoreUsedRecord scoreUsedRecord = new UserScoreUsedRecord();
+				scoreUsedRecord.setId(scoreUsedRecord.getId());
+				scoreUsedRecord.setUid(uid);
+				scoreUsedRecord.setGoodsId(goodsId);
+				scoreUsedRecord.setGoodsName(goodsName + "等商品");
+				scoreUsedRecord.setType(type);
+				scoreUsedRecord.setScore(nowScore);
+				scoreUsedRecord.setUsedScore(score);
+				scoreUsedRecord.setCreateTime(new Timestamp(System.currentTimeMillis()));
+				userScoreUsedRecordDao.save(scoreUsedRecord);
+				//新增购买人数次数
+				this.addSuccTimes(goods);
+				
+				resp.setReturnCode(Constant.SUCCESS);
+				resp.setErrorMessage("下单成功!");
+				
 			}
-			
-			int nowScore = user.getScore();
-			//新增积分使用记录
-			UserScoreUsedRecord scoreUsedRecord = new UserScoreUsedRecord();
-			scoreUsedRecord.setId(scoreUsedRecord.getId());
-			scoreUsedRecord.setUid(uid);
-			scoreUsedRecord.setGoodsId(goodsId);
-			scoreUsedRecord.setGoodsName(goodsName + "等商品");
-			scoreUsedRecord.setType(type);
-			scoreUsedRecord.setScore(nowScore);
-			scoreUsedRecord.setUsedScore(score);
-			scoreUsedRecord.setCreateTime(new Timestamp(System.currentTimeMillis()));
-			userScoreUsedRecordDao.save(scoreUsedRecord);
-			//新增购买人数次数
-			this.addSuccTimes(goods);
-			
-			resp.setReturnCode(Constant.SUCCESS);
-			resp.setErrorMessage("下单成功!");
 		} catch (Exception e) {
 			log.error("系统异常,{}",e);
 			throw AMPException.getException("下单异常!");
@@ -251,6 +272,19 @@ public class OrderService {
 			order.setCreateTime(new Timestamp(System.currentTimeMillis()));
 			orderInfoDao.save(order);
 			int nowScore = user.getScore();
+			
+			//客如云扣减积分
+			String customerId = user.getCustomerId();
+			
+			String remark = String.format("%s购买%s",customerId,goodsName);
+			keruyunService.cutScore(customerId, score,remark);
+			
+			//给上级返积分
+			int parentid = user.getParentid();
+			if(parentid != 0) {
+				scoreService.returnScore(parentid, score);
+			}
+			
 			//新增积分使用记录
 			UserScoreUsedRecord scoreUsedRecord = new UserScoreUsedRecord();
 			scoreUsedRecord.setId(scoreUsedRecord.getId());

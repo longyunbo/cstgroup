@@ -23,7 +23,7 @@ public class UserVo implements Serializable {
 	/**
 	 * 上级编号
 	 */
-	private String parentid;
+	private int parentid;
 	/**
 	 * 用户类型：0-个人，1-企业
 	 */
@@ -57,9 +57,21 @@ public class UserVo implements Serializable {
 	 */
 	private String mobile;
 	/**
+	 * 客如云客户编号
+	 */
+	private String customerId;
+	/**
+	 * 客如云客户主编号
+	 */
+	private String customerMainId;
+	/**
 	 * 职业
 	 */
 	private String profession;
+	/**
+	 * 职位
+	 */
+	private String job;
 	/**
 	 * 会员等级
 	 */
@@ -72,6 +84,10 @@ public class UserVo implements Serializable {
 	 * 余额
 	 */
 	private BigDecimal balance;
+	/**
+	 * 赠送余额
+	 */
+	private BigDecimal extraBalance;
 	/**
 	 * 总充值金额
 	 */

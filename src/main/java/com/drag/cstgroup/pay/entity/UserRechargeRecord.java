@@ -31,6 +31,10 @@ import lombok.NoArgsConstructor;
 public class UserRechargeRecord implements Serializable {
 	
 	private static final long serialVersionUID = 1132709062379976201L;
+	//充值状态0-成功，1-失败
+	public final static int STATUS_SUCC = 0;
+	public final static int STATUS_FAIL = 1;
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
@@ -43,13 +47,22 @@ public class UserRechargeRecord implements Serializable {
 	 */
 	private BigDecimal balance;
 	/**
-	 * 充值余额
+	 * 充值金额
 	 */
 	private BigDecimal rechargeBalance;
+	/**
+	 * 充值赠送金额
+	 */
+	private BigDecimal extraBalance;
+	
 	/**
 	 * 商户订单号
 	 */
 	private String outTradeNo;
+	/**
+	 * 充值状态,0-成功，1-失败
+	 */
+	private int status;
 	/**
 	 * 创建时间
 	 */

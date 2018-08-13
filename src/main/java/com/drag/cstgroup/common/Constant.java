@@ -44,6 +44,8 @@ public final class Constant {
 	public static final String SCORE_NOTENOUGH = "9009";
 	//用户余额不足
 	public static final String MONEY_NOTENOUGH = "9010";
+	//用户充值异常
+	public static final String RECHARGE_ERROR = "9011";
 	
 	
 }

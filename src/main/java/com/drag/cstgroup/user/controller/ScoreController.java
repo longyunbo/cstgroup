@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.drag.cstgroup.common.BaseResponse;
 import com.drag.cstgroup.user.service.ScoreService;
 import com.drag.cstgroup.user.vo.ScoreRecordVo;
 
@@ -28,7 +29,7 @@ public class ScoreController {
 	
 	
 	/**
-	 * 查询职业信息
+	 * 查询积分记录
 	 * @return
 	 */
 	@RequestMapping(value = "/scorerecord", method = {RequestMethod.POST,RequestMethod.GET})
@@ -37,6 +38,18 @@ public class ScoreController {
 		return new ResponseEntity<List<ScoreRecordVo>>(br, HttpStatus.OK);
 	}
 	
+	/**
+	 * 赠送积分
+	 * @param openid
+	 * @param sendOpenid
+	 * @param score
+	 * @return
+	 */
+	@RequestMapping(value = "/scoresend", method = {RequestMethod.POST,RequestMethod.GET})
+	public @ResponseBody ResponseEntity<BaseResponse> scoreSend(@RequestParam String openid,@RequestParam String sendopenid,int score) {
+		BaseResponse resp =  scoreService.sendScore(openid,sendopenid,score);
+		return new ResponseEntity<BaseResponse>(resp, HttpStatus.OK);
+	}
 	
 	
 }

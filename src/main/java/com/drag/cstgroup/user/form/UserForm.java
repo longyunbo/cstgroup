@@ -12,7 +12,7 @@ public class UserForm {
 	/**
 	 * parentid
 	 */
-	private String parentid;
+	private int parentid;
 	/**
 	 * 用户类型：0-个人，1-企业
 	 */
@@ -30,13 +30,18 @@ public class UserForm {
 	 */
 	private String realname;
 	/**
-	 * 性别：0-男，1-女
+	 * 性别：0-女，1-男
 	 */
 	private int sex;
 	/**
 	 * 生日
 	 */
 	private String birthday;
+	/**
+	 * 邮箱
+	 */
+	private String email;
+	
 	/**
 	 * 手机
 	 */
@@ -45,6 +50,10 @@ public class UserForm {
 	 * 职业
 	 */
 	private String profession;
+	/**
+	 * 职位
+	 */
+	private String job;
 	/**
 	 * 企业名称
 	 */

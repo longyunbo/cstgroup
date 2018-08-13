@@ -10,15 +10,18 @@ import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.alibaba.fastjson.JSON;
 import com.drag.cstgroup.common.BaseResponse;
 import com.drag.cstgroup.common.Constant;
 import com.drag.cstgroup.common.exception.AMPException;
+import com.drag.cstgroup.keruyun.service.KeruyunService;
 import com.drag.cstgroup.user.dao.UserDao;
 import com.drag.cstgroup.user.dao.UserScoreRecordDao;
 import com.drag.cstgroup.user.dao.UserScoreUsedRecordDao;
 import com.drag.cstgroup.user.entity.User;
 import com.drag.cstgroup.user.entity.UserScoreRecord;
 import com.drag.cstgroup.user.entity.UserScoreUsedRecord;
+import com.drag.cstgroup.user.resp.ScoreResp;
 import com.drag.cstgroup.user.vo.ScoreRecordVo;
 import com.drag.cstgroup.utils.BeanUtils;
 import com.drag.cstgroup.utils.DateUtil;
@@ -35,6 +38,8 @@ public class ScoreService {
 	private UserScoreRecordDao scoreRecordDao;
 	@Autowired
 	private UserScoreUsedRecordDao scoreUsedRecordDao;
+	@Autowired
+	private KeruyunService keruyunService;
 	
 	/**
 	 * 查询用户积分记录
@@ -95,6 +100,7 @@ public class ScoreService {
 				return resp;
 			}
 			int uid = us.getId();
+			String customerId = us.getCustomerId();
 			BigDecimal balance = us.getBalance();
 			if(balance.compareTo(price)  < 0) {
 				resp.setReturnCode(Constant.MONEY_NOTENOUGH);
@@ -103,13 +109,35 @@ public class ScoreService {
 				return resp;
 			}
 			
-			int uscore = us.getScore();
 			//余额 = 余额 - 消耗金额
 			balance = balance.subtract(price);
+			/**
+			 * TODO
+			 */
+			//客如云没有直接扣除余额的接口
+			
+			
+			int uscore = us.getScore();
 			int nowScore = uscore + score;
+			String remark = String.format("%s购买积分",customerId);
+			ScoreResp sresp = keruyunService.addScore(customerId, score,remark);
+			String sreturnCode = sresp.getReturnCode();
+			if(!Constant.SUCCESS.equals(sreturnCode)) {
+				resp.setReturnCode(Constant.RECHARGE_ERROR);
+				resp.setErrorMessage("该用户积分购买异常，请联系客服!");
+				log.error("【用户积分增加异常】:sresp = {}",JSON.toJSONString(sresp));
+				return resp;
+			}
+			String kryCurrentPoints = sresp.getCurrentPoints();
+			if(!kryCurrentPoints.equals(String.valueOf(nowScore))) {
+				resp.setReturnCode(Constant.RECHARGE_ERROR);
+				resp.setErrorMessage("该用户积分异常，请联系客服!");
+				log.error("【用户积分增加异常】:openid = {},kryCurrentPoints = {},nowScore = {}",openid,kryCurrentPoints,nowScore);
+				return resp;
+			}
+			us.setScore(nowScore);
 			
 			us.setBalance(balance);
-			us.setScore(nowScore);
 			userDao.saveAndFlush(us);
 			
 			//新增积分记录
@@ -151,12 +179,29 @@ public class ScoreService {
 				return resp;
 			}
 			int uid = us.getId();
-			int uscore = us.getScore();
+			String customerId = us.getCustomerId();
 			
+			int uscore = us.getScore();
 			int nowScore = uscore + score;
+			String remark = String.format("%s下级消费返回积分",customerId);
+			ScoreResp sresp = keruyunService.addScore(customerId, score,remark);
+			String sreturnCode = sresp.getReturnCode();
+			if(!Constant.SUCCESS.equals(sreturnCode)) {
+				resp.setReturnCode(Constant.RECHARGE_ERROR);
+				resp.setErrorMessage("该用户积分异常，请联系客服!");
+				log.error("【用户积分增加异常】:sresp = {}",JSON.toJSONString(sresp));
+				return resp;
+			}
+			String kryCurrentPoints = sresp.getCurrentPoints();
+			if(!kryCurrentPoints.equals(String.valueOf(nowScore))) {
+				resp.setReturnCode(Constant.RECHARGE_ERROR);
+				resp.setErrorMessage("该用户积分异常，请联系客服!");
+				log.error("【用户积分增加异常】:parentid = {},kryCurrentPoints = {},nowScore = {}",parentid,kryCurrentPoints,nowScore);
+				return resp;
+			}
+			
 			us.setScore(nowScore);
 			userDao.saveAndFlush(us);
-			
 			//新增积分记录
 			UserScoreRecord scoreRecord = new UserScoreRecord();
 			scoreRecord.setId(scoreRecord.getId());
@@ -200,6 +245,8 @@ public class ScoreService {
 			//本人的积分
 			int uid = us.getId();
 			int uScore = us.getScore();
+			String uCustomerId = us.getCustomerId();
+			
 			if(uScore < score) {
 				resp.setReturnCode(Constant.SCORE_NOTENOUGH);
 				resp.setErrorMessage("用户积分不足!");
@@ -210,9 +257,47 @@ public class ScoreService {
 			//对方的积分
 			int sUid = sendUs.getId();
 			int sScore = sendUs.getScore();
+			String sCustomerId = sendUs.getCustomerId();
 			
 			int nowMyScore = uScore - score;
 			int nowYouScore = sScore + score;
+			
+			//赠送的用户加积分
+			String remark = String.format("%s赠送%s",uCustomerId,sCustomerId);
+			ScoreResp sresp = keruyunService.addScore(sCustomerId, score,remark);
+			String sreturnCode = sresp.getReturnCode();
+			if(!Constant.SUCCESS.equals(sreturnCode)) {
+				resp.setReturnCode(Constant.RECHARGE_ERROR);
+				resp.setErrorMessage("该用户积分异常，请联系客服!");
+				log.error("【用户积分增加异常】:sresp = {}",JSON.toJSONString(sresp));
+				return resp;
+			}
+			String kryYouCurrentPoints = sresp.getCurrentPoints();
+			if(!kryYouCurrentPoints.equals(String.valueOf(nowYouScore))) {
+				resp.setReturnCode(Constant.RECHARGE_ERROR);
+				resp.setErrorMessage("该用户积分异常，请联系客服!");
+				log.error("【用户积分增加异常】:sCustomerId = {},kryCurrentPoints = {},nowYouScore = {}",sCustomerId,kryYouCurrentPoints,nowYouScore);
+				return resp;
+			}
+			
+			//本人减积分
+//			String remark = String.format("%s赠送%s",uCustomerId,sCustomerId);
+			ScoreResp mySresp = keruyunService.cutScore(uCustomerId, score,remark);
+			String mySreturnCode = mySresp.getReturnCode();
+			if(!Constant.SUCCESS.equals(mySreturnCode)) {
+				resp.setReturnCode(Constant.RECHARGE_ERROR);
+				resp.setErrorMessage("该用户积分异常，请联系客服!");
+				log.error("【用户积分增加异常】:sresp = {}",JSON.toJSONString(mySresp));
+				return resp;
+			}
+			String kryMyCurrentPoints = mySresp.getCurrentPoints();
+			if(!kryMyCurrentPoints.equals(String.valueOf(nowMyScore))) {
+				resp.setReturnCode(Constant.RECHARGE_ERROR);
+				resp.setErrorMessage("该用户积分异常，请联系客服!");
+				log.error("【用户积分增加异常】:uCustomerId = {},kryMyCurrentPoints = {},nowMyScore = {}",uCustomerId,kryMyCurrentPoints,nowMyScore);
+				return resp;
+			}
+			
 			
 			us.setScore(nowMyScore);
 			sendUs.setScore(nowYouScore);
