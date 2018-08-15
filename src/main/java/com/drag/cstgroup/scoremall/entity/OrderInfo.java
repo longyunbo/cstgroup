@@ -48,6 +48,9 @@ public class OrderInfo implements Serializable {
 	public static final int STATUS_RECEIVED = 2;
 	public static final int STATUS_REFUSED = 2;
 	
+	public static final int ISBILLING_NO = 0;
+	public static final int ISBILLING_YES = 1;
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
@@ -159,6 +162,10 @@ public class OrderInfo implements Serializable {
 	 * 发票内容
 	 */
 	private String invContent;
+	/**
+	 * 开票时间
+	 */
+	private Date billTime;
 	/**
 	 * 确认收货时间
 	 */

@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -13,7 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.fastjson.JSONObject;
 import com.drag.cstgroup.keruyun.service.KeruyunService;
-import com.drag.cstgroup.keruyun.util.SignUtil;
+import com.drag.cstgroup.pay.form.PayForm;
+import com.drag.cstgroup.pay.resp.PayResp;
 
 
 @RestController
@@ -31,4 +33,15 @@ public class KeruyunController {
 		return new ResponseEntity<JSONObject>(Json, HttpStatus.OK);
 	}
 	
+	@RequestMapping(value = "/login", method = {RequestMethod.POST,RequestMethod.GET})
+	public @ResponseBody ResponseEntity<JSONObject> login(@RequestParam String openid) {
+		JSONObject Json = keruyunService.login(openid);
+		return new ResponseEntity<JSONObject>(Json, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/ordercreate", method = {RequestMethod.POST,RequestMethod.GET})
+	public @ResponseBody ResponseEntity<PayResp> ordercreate(@RequestBody PayForm form) {
+		PayResp Json = keruyunService.createOrder(form);
+		return new ResponseEntity<PayResp>(Json, HttpStatus.OK);
+	}
 }

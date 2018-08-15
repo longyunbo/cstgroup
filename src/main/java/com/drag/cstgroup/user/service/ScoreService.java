@@ -15,6 +15,8 @@ import com.drag.cstgroup.common.BaseResponse;
 import com.drag.cstgroup.common.Constant;
 import com.drag.cstgroup.common.exception.AMPException;
 import com.drag.cstgroup.keruyun.service.KeruyunService;
+import com.drag.cstgroup.pay.form.PayForm;
+import com.drag.cstgroup.pay.resp.PayResp;
 import com.drag.cstgroup.user.dao.UserDao;
 import com.drag.cstgroup.user.dao.UserScoreRecordDao;
 import com.drag.cstgroup.user.dao.UserScoreUsedRecordDao;
@@ -25,6 +27,7 @@ import com.drag.cstgroup.user.resp.ScoreResp;
 import com.drag.cstgroup.user.vo.ScoreRecordVo;
 import com.drag.cstgroup.utils.BeanUtils;
 import com.drag.cstgroup.utils.DateUtil;
+import com.drag.cstgroup.utils.StringUtil;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -111,14 +114,23 @@ public class ScoreService {
 			
 			//余额 = 余额 - 消耗金额
 			balance = balance.subtract(price);
-			/**
-			 * TODO
-			 */
-			//客如云没有直接扣除余额的接口
+			//自己生产的订单号
+			String tpOrderId = StringUtil.uuid();
+			//客如云没有直接扣除余额的接口,调用下单接口扣减余额
+			PayForm form = new PayForm();
+			form.setTpOrderId(tpOrderId);
+			form.setOpenid(openid);
+			form.setPrice(price);
+			PayResp payResp = keruyunService.createOrder(form);
+			if(!Constant.SUCCESS.equals(payResp.getReturnCode())) {
+				resp.setReturnCode(payResp.getReturnCode());
+				resp.setErrorMessage(payResp.getErrorMessage());
+				log.error("【下单，异常】payResp:{}",JSON.toJSONString(payResp));
+				return resp;
+			}
+			//客如云返回的订单号
+			String orderId = payResp.getOrderId();
 			
-			
-			int uscore = us.getScore();
-			int nowScore = uscore + score;
 			String remark = String.format("%s购买积分",customerId);
 			ScoreResp sresp = keruyunService.addScore(customerId, score,remark);
 			String sreturnCode = sresp.getReturnCode();
@@ -129,13 +141,14 @@ public class ScoreService {
 				return resp;
 			}
 			String kryCurrentPoints = sresp.getCurrentPoints();
-			if(!kryCurrentPoints.equals(String.valueOf(nowScore))) {
+			if(!StringUtil.isEmpty(kryCurrentPoints)) {
+				us.setScore(Integer.parseInt(kryCurrentPoints));
+			}else {
 				resp.setReturnCode(Constant.RECHARGE_ERROR);
 				resp.setErrorMessage("该用户积分异常，请联系客服!");
-				log.error("【用户积分增加异常】:openid = {},kryCurrentPoints = {},nowScore = {}",openid,kryCurrentPoints,nowScore);
+				log.error("【用户积分增加异常】:sresp = {}",JSON.toJSONString(sresp));
 				return resp;
 			}
-			us.setScore(nowScore);
 			
 			us.setBalance(balance);
 			userDao.saveAndFlush(us);
@@ -147,8 +160,10 @@ public class ScoreService {
 			scoreRecord.setGoodsId(0);
 			scoreRecord.setGoodsName("购买积分" + score);
 			scoreRecord.setType(UserScoreRecord.TYPE_BUY);
-			scoreRecord.setScore(nowScore);
+			scoreRecord.setScore(Integer.parseInt(kryCurrentPoints));
 			scoreRecord.setAvailableScore(score);
+			scoreRecord.setTpOrderId(tpOrderId);
+			scoreRecord.setOrderId(orderId);
 			scoreRecord.setCreateTime(new Date(System.currentTimeMillis()));
 			scoreRecordDao.save(scoreRecord);
 		} catch (Exception e) {
@@ -167,7 +182,7 @@ public class ScoreService {
 	 * @return
 	 */
 	@Transactional
-	public BaseResponse returnScore(int parentid,int score) {
+	public BaseResponse returnScore(int chidid,int parentid,int score) {
 		BaseResponse resp = new BaseResponse();
 		try {
 			log.info("【会员下级返回积分传入参数】:parentid= {},score= {}",parentid,score);
@@ -181,8 +196,8 @@ public class ScoreService {
 			int uid = us.getId();
 			String customerId = us.getCustomerId();
 			
-			int uscore = us.getScore();
-			int nowScore = uscore + score;
+			//百分之10返回给上级
+			score = score / 10;
 			String remark = String.format("%s下级消费返回积分",customerId);
 			ScoreResp sresp = keruyunService.addScore(customerId, score,remark);
 			String sreturnCode = sresp.getReturnCode();
@@ -193,23 +208,25 @@ public class ScoreService {
 				return resp;
 			}
 			String kryCurrentPoints = sresp.getCurrentPoints();
-			if(!kryCurrentPoints.equals(String.valueOf(nowScore))) {
+			if(!StringUtil.isEmpty(kryCurrentPoints)) {
+				us.setScore(Integer.parseInt(kryCurrentPoints));
+			}else {
 				resp.setReturnCode(Constant.RECHARGE_ERROR);
 				resp.setErrorMessage("该用户积分异常，请联系客服!");
-				log.error("【用户积分增加异常】:parentid = {},kryCurrentPoints = {},nowScore = {}",parentid,kryCurrentPoints,nowScore);
+				log.error("【用户积分增加异常】:sresp = {}",JSON.toJSONString(sresp));
 				return resp;
 			}
 			
-			us.setScore(nowScore);
 			userDao.saveAndFlush(us);
 			//新增积分记录
 			UserScoreRecord scoreRecord = new UserScoreRecord();
 			scoreRecord.setId(scoreRecord.getId());
 			scoreRecord.setUid(uid);
+			scoreRecord.setFuid(chidid);
 			scoreRecord.setGoodsId(0);
 			scoreRecord.setGoodsName("下级消费返回积分" + score);
 			scoreRecord.setType(UserScoreRecord.TYPE_RETURN);
-			scoreRecord.setScore(nowScore);
+			scoreRecord.setScore(Integer.parseInt(kryCurrentPoints));
 			scoreRecord.setAvailableScore(score);
 			scoreRecord.setCreateTime(new Date(System.currentTimeMillis()));
 			scoreRecordDao.save(scoreRecord);
@@ -256,11 +273,11 @@ public class ScoreService {
 			
 			//对方的积分
 			int sUid = sendUs.getId();
-			int sScore = sendUs.getScore();
+//			int sScore = sendUs.getScore();
 			String sCustomerId = sendUs.getCustomerId();
 			
-			int nowMyScore = uScore - score;
-			int nowYouScore = sScore + score;
+//			int nowMyScore = uScore - score;
+//			int nowYouScore = sScore + score;
 			
 			//赠送的用户加积分
 			String remark = String.format("%s赠送%s",uCustomerId,sCustomerId);
@@ -273,34 +290,33 @@ public class ScoreService {
 				return resp;
 			}
 			String kryYouCurrentPoints = sresp.getCurrentPoints();
-			if(!kryYouCurrentPoints.equals(String.valueOf(nowYouScore))) {
+			if(!StringUtil.isEmpty(kryYouCurrentPoints)) {
+				sendUs.setScore(Integer.parseInt(kryYouCurrentPoints));
+			}else {
 				resp.setReturnCode(Constant.RECHARGE_ERROR);
 				resp.setErrorMessage("该用户积分异常，请联系客服!");
-				log.error("【用户积分增加异常】:sCustomerId = {},kryCurrentPoints = {},nowYouScore = {}",sCustomerId,kryYouCurrentPoints,nowYouScore);
+				log.error("【用户积分增加异常】:sresp = {}",JSON.toJSONString(sresp));
 				return resp;
 			}
 			
 			//本人减积分
-//			String remark = String.format("%s赠送%s",uCustomerId,sCustomerId);
 			ScoreResp mySresp = keruyunService.cutScore(uCustomerId, score,remark);
 			String mySreturnCode = mySresp.getReturnCode();
 			if(!Constant.SUCCESS.equals(mySreturnCode)) {
 				resp.setReturnCode(Constant.RECHARGE_ERROR);
 				resp.setErrorMessage("该用户积分异常，请联系客服!");
-				log.error("【用户积分增加异常】:sresp = {}",JSON.toJSONString(mySresp));
+				log.error("【用户积分扣减异常】:sresp = {}",JSON.toJSONString(mySresp));
 				return resp;
 			}
 			String kryMyCurrentPoints = mySresp.getCurrentPoints();
-			if(!kryMyCurrentPoints.equals(String.valueOf(nowMyScore))) {
+			if(!StringUtil.isEmpty(kryMyCurrentPoints)) {
+				us.setScore(Integer.parseInt(kryMyCurrentPoints));
+			}else {
 				resp.setReturnCode(Constant.RECHARGE_ERROR);
 				resp.setErrorMessage("该用户积分异常，请联系客服!");
-				log.error("【用户积分增加异常】:uCustomerId = {},kryMyCurrentPoints = {},nowMyScore = {}",uCustomerId,kryMyCurrentPoints,nowMyScore);
+				log.error("【用户积分扣减异常】:sresp = {}",JSON.toJSONString(sresp));
 				return resp;
 			}
-			
-			
-			us.setScore(nowMyScore);
-			sendUs.setScore(nowYouScore);
 			
 			userDao.saveAndFlush(us);
 			userDao.saveAndFlush(sendUs);
@@ -315,7 +331,7 @@ public class ScoreService {
 			scoreRecord.setGoodsId(0);
 			scoreRecord.setGoodsName("赠送积分" + score);
 			scoreRecord.setType(UserScoreRecord.TYPE_SEND);
-			scoreRecord.setScore(nowMyScore);
+			scoreRecord.setScore(Integer.parseInt(kryMyCurrentPoints));
 			scoreRecord.setAvailableScore(score);
 			scoreRecord.setCreateTime(new Date(System.currentTimeMillis()));
 			scoreRecordDao.save(scoreRecord);
@@ -327,7 +343,7 @@ public class ScoreService {
 			userUsedRecord.setGoodsId(0);
 			userUsedRecord.setGoodsName("赠送积分" + score);
 			userUsedRecord.setType(UserScoreRecord.TYPE_SEND);
-			userUsedRecord.setScore(nowMyScore);
+			userUsedRecord.setScore(Integer.parseInt(kryMyCurrentPoints));
 			userUsedRecord.setUsedScore(score);
 			userUsedRecord.setCreateTime(new Date(System.currentTimeMillis()));
 			scoreUsedRecordDao.save(userUsedRecord);
@@ -341,7 +357,7 @@ public class ScoreService {
 			youScoreRecord.setGoodsId(0);
 			youScoreRecord.setGoodsName("获赠积分" + score);
 			youScoreRecord.setType(UserScoreRecord.TYPE_GET);
-			youScoreRecord.setScore(nowYouScore);
+			youScoreRecord.setScore(Integer.parseInt(kryYouCurrentPoints));
 			youScoreRecord.setAvailableScore(score);
 			youScoreRecord.setCreateTime(new Date(System.currentTimeMillis()));
 			scoreRecordDao.save(youScoreRecord);

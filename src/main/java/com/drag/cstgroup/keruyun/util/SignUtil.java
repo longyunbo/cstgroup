@@ -20,18 +20,12 @@ import lombok.extern.slf4j.Slf4j;
 public class SignUtil {
 	
 	private static String keruyunurl;
-	private static String appKey;
 	private static String shopIdenty;
 	private static String version;
-	private static String secretKey;
 	
 	@Value("${keruyun.url.url}")
     public void setKeruyunurl(String value) {
 		keruyunurl = value;
-    }
-	@Value("${keruyun.url.appKey}")
-    public void seAppKey(String value) {
-		appKey = value;
     }
 	@Value("${keruyun.url.shopIdenty}")
     public void setShopIdenty(String value) {
@@ -41,18 +35,15 @@ public class SignUtil {
     public void setVersion(String value) {
 		version = value;
     }
-	@Value("${keruyun.url.secretKey}")
-    public void setSecretKey(String value) {
-		secretKey = value;
-    }
 	
 	 /**
      * 获取Token
      * @return
+	 * @throws NoSuchAlgorithmException 
      */
-    public static String getToken(){
+    public static String getToken(String appKey,String secretKey) throws NoSuchAlgorithmException{
     	Date timestamp = new Date(System.currentTimeMillis());
-    	String sign = SignUtil.signForToken();
+    	String sign = SignUtil.signForToken(appKey,secretKey);
     	String requestUrl = String.format("%s/open/v1/token/get?appKey=%s&shopIdenty=%s&version=%s&timestamp=%s&sign=%s",keruyunurl,appKey,shopIdenty,version,timestamp.getTime(),sign);
         JSONObject resultJson =null;
         JSONObject resultJs = null;
@@ -75,7 +66,7 @@ public class SignUtil {
      * 获取signForToken
      * @return
      */
-    public static String signForToken() {
+    public static String signForToken(String appKey,String secretKey) throws NoSuchAlgorithmException {
 		Date timestamp = new Date(System.currentTimeMillis());
 		Map<String, Object> params = new TreeMap<>();
 		params.put("appKey", appKey);
@@ -86,19 +77,16 @@ public class SignUtil {
 		params.entrySet().stream().forEachOrdered(paramEntry -> sortedParams.append(paramEntry.getKey()).append(paramEntry.getValue()));
 		sortedParams.append(secretKey);//请替换成真实的secretKey
 		String SHA256Sign = null;
-		try {
-			SHA256Sign = SignUtil.getSign(sortedParams.toString());
-		} catch (NoSuchAlgorithmException e) {
-			log.info("获取签名出错" + e.getMessage(), e);
-		}
+		SHA256Sign = SignUtil.getSign(sortedParams.toString());
 		return SHA256Sign;
 	}
     
     /**
      * 获取签名
      * @return
+     * @throws NoSuchAlgorithmException 
      */
-    public static String getSign(){
+    public static String getSign(String appKey,String secretKey) throws NoSuchAlgorithmException{
     	String sign = "";
     	Date timestamp = new Date(System.currentTimeMillis());
     	Map<String, Object> params = new TreeMap<>();
@@ -108,7 +96,7 @@ public class SignUtil {
 		params.put("timestamp", timestamp.getTime());
 		StringBuilder sortedParams = new StringBuilder();
 		params.entrySet().stream().forEachOrdered(paramEntry -> sortedParams.append(paramEntry.getKey()).append(paramEntry.getValue()));
-		String token = SignUtil.getToken();
+		String token = SignUtil.getToken(appKey,secretKey);
 		sortedParams.append(token);//请替换成真实的token
 		System.out.println(sortedParams);
 		try {
@@ -121,16 +109,18 @@ public class SignUtil {
     }
     
     /**
-	 * 获取公共参数
+	 * 获取会员公共参数
 	 * @return
 	 * @throws NoSuchAlgorithmException
 	 */
-	public static String getComParam() {
+	public static String getComParam(String appKey,String secretKey) throws NoSuchAlgorithmException {
 		Date timestamp = new Date(System.currentTimeMillis());
-		String sign = SignUtil.getSign();
+		String sign = SignUtil.getSign(appKey,secretKey);
 		String requestUrl = String.format("appKey=%s&shopIdenty=%s&version=%s&timestamp=%s&sign=%s",appKey,shopIdenty,version,timestamp.getTime(),sign);
 		return requestUrl;
-	}	
+	}
+	
+	
 	
 	/**
 	 * @Description: SHA256加密字符串

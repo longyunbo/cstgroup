@@ -1,6 +1,7 @@
 package com.drag.cstgroup.scoremall.vo;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -124,6 +125,10 @@ public class OrderInfoVo implements Serializable {
 	 * 发票内容
 	 */
 	private String invContent;
+	/**
+	 * 开票时间
+	 */
+	private String billTime;
 	/**
 	 * 确认收货时间
 	 */

@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,8 +19,10 @@ import com.drag.cstgroup.user.service.UserTicketService;
 import com.drag.cstgroup.user.vo.UserTicketVo;
 
 
+
 @RestController
-@RequestMapping(value = "/chirouosopark/ticket")
+@RequestMapping(value = "/cstgroup/ticket")
+@CrossOrigin
 public class UserTicketController {
 	
 	private final static Logger log = LoggerFactory.getLogger(UserTicketController.class);

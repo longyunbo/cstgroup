@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.drag.cstgroup.scoremall.form.OrderInfoForm;
 import com.drag.cstgroup.scoremall.resp.OrderResp;
 import com.drag.cstgroup.scoremall.service.OrderService;
+import com.drag.cstgroup.scoremall.vo.OrderDetailVo;
 import com.drag.cstgroup.scoremall.vo.OrderInfoVo;
 
 
@@ -53,6 +54,17 @@ public class OrderController {
 	}
 	
 	/**
+	 * 开发票
+	 * @param form
+	 * @return
+	 */
+	@RequestMapping(value = "/openbill", method = {RequestMethod.POST,RequestMethod.GET})
+	public @ResponseBody ResponseEntity<OrderResp> openBill(@RequestBody OrderInfoForm form) {
+		OrderResp detailVo = orderInfoService.openBill(form);
+		return new ResponseEntity<OrderResp>(detailVo, HttpStatus.OK);
+	}
+	
+	/**
 	 * 获取我的订单
 	 * @param openid
 	 * @return
@@ -63,5 +75,28 @@ public class OrderController {
 		return new ResponseEntity<List<OrderInfoVo>>(list, HttpStatus.OK);
 	}
 	
+	/**
+	 * 订单详情
+	 * @param orderid
+	 * @return
+	 */
+	@RequestMapping(value = "/orderdetail", method = {RequestMethod.POST,RequestMethod.GET})
+	public @ResponseBody ResponseEntity<List<OrderDetailVo>> orderDetail(@RequestParam(required = true)  String orderid) {
+		List<OrderDetailVo> list = orderInfoService.orderDetail(orderid);
+		return new ResponseEntity<List<OrderDetailVo>>(list, HttpStatus.OK);
+	}
+	
+	
+	
+	/**
+	 * 获取我的发票
+	 * @param openid
+	 * @return
+	 */
+	@RequestMapping(value = "/mybills", method = {RequestMethod.POST,RequestMethod.GET})
+	public @ResponseBody ResponseEntity<List<OrderInfoVo>> mybills(@RequestParam(required = true)  String openid) {
+		List<OrderInfoVo> list = orderInfoService.myBill(openid);
+		return new ResponseEntity<List<OrderInfoVo>>(list, HttpStatus.OK);
+	}
 	
 }

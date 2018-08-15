@@ -16,4 +16,9 @@ public class PayForm {
 	//微信支付商户单号
 	private String outTradeNo;
 	
+	//积分购买订单号
+	private String tpOrderId;
+	
+	
+	
 }

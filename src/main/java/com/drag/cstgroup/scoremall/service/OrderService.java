@@ -2,7 +2,9 @@ package com.drag.cstgroup.scoremall.service;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.transaction.Transactional;
 
@@ -22,11 +24,17 @@ import com.drag.cstgroup.scoremall.entity.ProductInfo;
 import com.drag.cstgroup.scoremall.form.OrderDetailForm;
 import com.drag.cstgroup.scoremall.form.OrderInfoForm;
 import com.drag.cstgroup.scoremall.resp.OrderResp;
+import com.drag.cstgroup.scoremall.vo.OrderDetailVo;
 import com.drag.cstgroup.scoremall.vo.OrderInfoVo;
 import com.drag.cstgroup.user.dao.UserDao;
 import com.drag.cstgroup.user.dao.UserScoreUsedRecordDao;
+import com.drag.cstgroup.user.dao.UserTicketDao;
+import com.drag.cstgroup.user.dao.UserTicketTemplateDao;
 import com.drag.cstgroup.user.entity.User;
 import com.drag.cstgroup.user.entity.UserScoreUsedRecord;
+import com.drag.cstgroup.user.entity.UserTicket;
+import com.drag.cstgroup.user.entity.UserTicketTemplate;
+import com.drag.cstgroup.user.resp.ScoreResp;
 import com.drag.cstgroup.user.service.ScoreService;
 import com.drag.cstgroup.utils.BeanUtils;
 import com.drag.cstgroup.utils.DateUtil;
@@ -52,6 +60,10 @@ public class OrderService {
 	private ScoreService scoreService;
 	@Autowired
 	private KeruyunService keruyunService;
+	@Autowired
+	private UserTicketDao userTicketDao;
+	@Autowired
+	private UserTicketTemplateDao userTicketTemplateDao;
 	
 	/**
 	 * 有机食品购买下单
@@ -74,14 +86,6 @@ public class OrderService {
 			String openid = form.getOpenid();
 			String buyName = form.getBuyName();
 			String phone = form.getPhone();
-			//是否开票
-//			int isBilling = form.getIsBilling();
-//			//开票类型
-//			String billingType = form.getBillingType();
-//			//开票抬头
-//			String invPayee = form.getInvPayee();
-//			//发票内容
-//			String invContent = form.getInvContent();
 			//订单方式（0:快递到家，1:送货上门）
 			int orderType = form.getOrderType();
 			//收货人
@@ -94,7 +98,6 @@ public class OrderService {
 			String postalcode = form.getPostalcode();
 			//地址
 			String receiptAddress  = form.getReceiptAddress();
-			//消耗总积分
 			User user = userDao.findByOpenid(openid);
 			ProductInfo goods = productInfoDao.findGoodsDetail(goodsId);
 			if(user != null) {
@@ -115,7 +118,6 @@ public class OrderService {
 				order.setType(type);
 				order.setNumber(number);
 				order.setScore(score);
-				//已付款,包含了减积分逻辑
 				order.setOrderstatus(OrderInfo.ORDERSTATUS_SUCCESS);
 				order.setUid(uid);
 				order.setBuyName(buyName);
@@ -127,10 +129,7 @@ public class OrderService {
 				order.setRegion(region);
 				order.setPostalcode(postalcode);
 				order.setReceiptAddress(receiptAddress);
-//			order.setIsBilling(isBilling);
-//			order.setBillingType(billingType);
-//			order.setInvPayee(invPayee);
-//			order.setInvContent(invContent);
+				order.setIsBilling(OrderInfo.ISBILLING_NO);
 				order.setCreateTime(new Timestamp(System.currentTimeMillis()));
 				order.setUpdateTime(new Timestamp(System.currentTimeMillis()));
 				orderInfoDao.save(order);
@@ -165,17 +164,31 @@ public class OrderService {
 					return resp;
 				}
 				
-				int nowScore = user.getScore();
-				
 				//客如云扣减积分
 				String customerId = user.getCustomerId();
-				String remark = String.format("%s购买%s",customerId,goodsName + "等商品");
-				keruyunService.cutScore(customerId, score,remark);
+				String remark = String.format("%s购买%s",customerId,goodsName+"等商品");
+				ScoreResp mySresp = keruyunService.cutScore(customerId, score,remark);
+				String mySreturnCode = mySresp.getReturnCode();
+				if(!Constant.SUCCESS.equals(mySreturnCode)) {
+					resp.setReturnCode(Constant.RECHARGE_ERROR);
+					resp.setErrorMessage("该用户积分异常，请联系客服!");
+					log.error("【用户积分扣减异常】:sresp = {}",JSON.toJSONString(mySresp));
+					return resp;
+				}
+				String kryMyCurrentPoints = mySresp.getCurrentPoints();
+				if(!StringUtil.isEmpty(kryMyCurrentPoints)) {
+					user.setScore(Integer.parseInt(kryMyCurrentPoints));
+				}else {
+					resp.setReturnCode(Constant.RECHARGE_ERROR);
+					resp.setErrorMessage("该用户积分异常，请联系客服!");
+					log.error("【用户积分扣减异常】:mySresp = {}",JSON.toJSONString(mySresp));
+					return resp;
+				}
 				
 				//给上级返积分
 				int parentid = user.getParentid();
 				if(parentid != 0) {
-					scoreService.returnScore(parentid, score);
+					scoreService.returnScore(uid,parentid, score);
 				}
 				
 				//新增积分使用记录
@@ -185,7 +198,7 @@ public class OrderService {
 				scoreUsedRecord.setGoodsId(goodsId);
 				scoreUsedRecord.setGoodsName(goodsName + "等商品");
 				scoreUsedRecord.setType(type);
-				scoreUsedRecord.setScore(nowScore);
+				scoreUsedRecord.setScore(Integer.parseInt(kryMyCurrentPoints));
 				scoreUsedRecord.setUsedScore(score);
 				scoreUsedRecord.setCreateTime(new Timestamp(System.currentTimeMillis()));
 				userScoreUsedRecordDao.save(scoreUsedRecord);
@@ -230,19 +243,9 @@ public class OrderService {
 			String buyName = form.getBuyName();
 			String phone = form.getPhone();
 			
-//			//是否开票
-//			int isBilling = form.getIsBilling();
-//			//开票类型
-//			String billingType = form.getBillingType();
-//			//开票抬头
-//			String invPayee = form.getInvPayee();
-//			//发票内容
-//			String invContent = form.getInvContent();
-			
-			
 			User user = userDao.findByOpenid(openid);
 			ProductInfo goods = productInfoDao.findGoodsDetail(goodsId);
-			//验证参数,包含了减积分逻辑
+			//验证参数
 			resp = this.checkParam(user,goods,form);
 			String returnCode = resp.getReturnCode();
 			if(!returnCode.equals(Constant.SUCCESS)) {
@@ -265,24 +268,52 @@ public class OrderService {
 			order.setBuyName(buyName);
 			order.setPhone(phone);
 			order.setNorms(norms);
-//			order.setIsBilling(isBilling);
-//			order.setBillingType(billingType);
-//			order.setInvPayee(invPayee);
-//			order.setInvContent(invContent);
+			order.setIsBilling(OrderInfo.ISBILLING_NO);
 			order.setCreateTime(new Timestamp(System.currentTimeMillis()));
 			orderInfoDao.save(order);
-			int nowScore = user.getScore();
+//			int nowScore = user.getScore();
 			
 			//客如云扣减积分
 			String customerId = user.getCustomerId();
-			
 			String remark = String.format("%s购买%s",customerId,goodsName);
-			keruyunService.cutScore(customerId, score,remark);
+			ScoreResp mySresp = keruyunService.cutScore(customerId, score,remark);
+			String mySreturnCode = mySresp.getReturnCode();
+			if(!Constant.SUCCESS.equals(mySreturnCode)) {
+				resp.setReturnCode(Constant.RECHARGE_ERROR);
+				resp.setErrorMessage("该用户积分异常，请联系客服!");
+				log.error("【用户积分扣减异常】:sresp = {}",JSON.toJSONString(mySresp));
+				return resp;
+			}
+			String kryMyCurrentPoints = mySresp.getCurrentPoints();
+			if(!StringUtil.isEmpty(kryMyCurrentPoints)) {
+				user.setScore(Integer.parseInt(kryMyCurrentPoints));
+			}else {
+				resp.setReturnCode(Constant.RECHARGE_ERROR);
+				resp.setErrorMessage("该用户积分异常，请联系客服!");
+				log.error("【用户积分扣减异常】:mySresp = {}",JSON.toJSONString(mySresp));
+				return resp;
+			}
 			
 			//给上级返积分
 			int parentid = user.getParentid();
 			if(parentid != 0) {
-				scoreService.returnScore(parentid, score);
+				scoreService.returnScore(uid,parentid, score);
+			}
+			
+			//发送卡券
+			if(type.equals("ly") || type.equals("tc")) {
+				UserTicketTemplate  template = userTicketTemplateDao.findByGoodsIdAndType(goodsId, type);
+				//发送卡券
+				if(template != null) {
+					UserTicket ticket = new UserTicket();
+					BeanUtils.copyProperties(template, ticket);
+					ticket.setId(ticket.getId());
+					ticket.setUid(uid);
+					ticket.setNumber(number);
+					ticket.setStatus(UserTicket.STATUS_NO);
+					ticket.setCreateTime((new Timestamp(System.currentTimeMillis())));
+					userTicketDao.save(ticket);
+				}
 			}
 			
 			//新增积分使用记录
@@ -292,7 +323,7 @@ public class OrderService {
 			scoreUsedRecord.setGoodsId(goodsId);
 			scoreUsedRecord.setGoodsName(goodsName);
 			scoreUsedRecord.setType(type);
-			scoreUsedRecord.setScore(nowScore);
+			scoreUsedRecord.setScore(Integer.parseInt(kryMyCurrentPoints));
 			scoreUsedRecord.setUsedScore(score);
 			scoreUsedRecord.setCreateTime(new Timestamp(System.currentTimeMillis()));
 			userScoreUsedRecordDao.save(scoreUsedRecord);
@@ -307,6 +338,75 @@ public class OrderService {
 		return resp;
 	}
 	
+	
+	@Transactional
+	public OrderResp openBill(OrderInfoForm form) {
+		log.info("【开发票传入参数】:{}",JSON.toJSONString(form));
+		OrderResp resp = new OrderResp();
+		try {
+			String orderid = form.getOrderid();
+			
+			OrderInfo order = orderInfoDao.findByOrderId(orderid);
+			if(order != null) {
+				//开票类型
+				String billingType = form.getBillingType();
+				//公司抬头/个人抬头
+				String invPayee = form.getInvPayee();
+				//发票内容
+				String invContent = form.getInvContent();
+				
+				order.setIsBilling(OrderInfo.ISBILLING_YES);
+				order.setBillingType(billingType);
+				order.setInvPayee(invPayee);
+				order.setInvContent(invContent);
+				order.setUpdateTime(new Timestamp(System.currentTimeMillis()));
+				orderInfoDao.saveAndFlush(order);
+			}else {
+				resp.setReturnCode(Constant.ORDERNOTEXISTS);
+				resp.setErrorMessage("订单不存在!");
+				log.error("【订单不存在】，goodsId={}",orderid);
+				return resp;
+			}
+		} catch (Exception e) {
+			log.error("系统异常,{}",e);
+			throw AMPException.getException("系统异常!");
+		}
+		resp.setReturnCode(Constant.SUCCESS);
+		resp.setErrorMessage("开票成功!");
+		return resp;
+	}
+	
+	/**
+	 * 订单详情
+	 * @param orderid
+	 * @return
+	 */
+	public List<OrderDetailVo> orderDetail(String orderid){
+		log.info("【订单详情传入参数】:{}", orderid);
+		List<OrderDetailVo> orderResp = new ArrayList<OrderDetailVo>();
+		List<OrderDetail> details = orderDetailDao.findByOrderId(orderid);
+		
+		List<ProductInfo> products = productInfoDao.findAll();
+		Map<Integer,ProductInfo> proMap = new HashMap<Integer,ProductInfo>();
+		if(products != null && products.size() > 0) {
+			for(ProductInfo pro : products) {
+				proMap.put(pro.getGoodsId(), pro);
+			}
+		}
+		if(details != null && details.size() > 0) {
+			for (OrderDetail order : details) {
+				OrderDetailVo vo = new OrderDetailVo();
+				BeanUtils.copyProperties(order, vo,new String[]{"createTime", "updateTime","billTime"});
+				int goodsid = order.getGoodsId();
+				vo.setGoodsThumb(proMap.get(goodsid).getGoodsThumb());
+				vo.setCreateTime((DateUtil.format(order.getCreateTime(), "yyyy-MM-dd HH:mm:ss")));
+				vo.setUpdateTime((DateUtil.format(order.getUpdateTime(), "yyyy-MM-dd HH:mm:ss")));
+				orderResp.add(vo);
+			}
+		}
+		return orderResp;
+	}
+	
 	/**
 	 * 获取个人订单
 	 * @param openid
@@ -316,14 +416,38 @@ public class OrderService {
 		log.info("【我的订单传入参数】:{}", openid);
 		List<OrderInfoVo> orderResp = new ArrayList<OrderInfoVo>();
 		User user = userDao.findByOpenid(openid);
-		int uid = user.getId();
 		if(user != null) {
+			int uid = user.getId();
 			List<OrderInfo> orderList = orderInfoDao.findByUid(uid);
 			for (OrderInfo order : orderList) {
 				OrderInfoVo vo = new OrderInfoVo();
-				BeanUtils.copyProperties(order, vo,new String[]{"createTime", "updateTime"});
+				BeanUtils.copyProperties(order, vo,new String[]{"createTime", "updateTime","billTime"});
 				vo.setCreateTime((DateUtil.format(order.getCreateTime(), "yyyy-MM-dd HH:mm:ss")));
 				vo.setUpdateTime((DateUtil.format(order.getUpdateTime(), "yyyy-MM-dd HH:mm:ss")));
+				orderResp.add(vo);
+			}
+		}
+		return orderResp;
+	}
+	
+	/**
+	 * 获取发票列表（在订单表中）
+	 * @param openid
+	 * @return
+	 */
+	public List<OrderInfoVo> myBill(String openid){
+		log.info("【我的发票传入参数】:{}", openid);
+		List<OrderInfoVo> orderResp = new ArrayList<OrderInfoVo>();
+		User user = userDao.findByOpenid(openid);
+		if(user != null) {
+			int uid = user.getId();
+			List<OrderInfo> orderList = orderInfoDao.findByUidAndBill(uid);
+			for (OrderInfo order : orderList) {
+				OrderInfoVo vo = new OrderInfoVo();
+				BeanUtils.copyProperties(order, vo,new String[]{"createTime", "updateTime","billTime"});
+				vo.setCreateTime((DateUtil.format(order.getCreateTime(), "yyyy-MM-dd HH:mm:ss")));
+				vo.setUpdateTime((DateUtil.format(order.getUpdateTime(), "yyyy-MM-dd HH:mm:ss")));
+				vo.setBillTime((DateUtil.format(order.getBillTime(), "yyyy-MM-dd HH:mm:ss")));
 				orderResp.add(vo);
 			}
 		}
@@ -395,10 +519,9 @@ public class OrderService {
 			resp.setErrorMessage("商品不存在!");
 			log.error("【商品不存在】，goodsId={}",goodsId);
 			return resp;
-			
 		}
-		Boolean flag = this.delScore(user, score);
-		if(!flag) {
+		int uScore = user.getScore();
+		if (uScore - score < 0) {
 			resp.setReturnCode(Constant.SCORE_NOTENOUGH);
 			resp.setErrorMessage("用户积分不足!");
 			log.error("【该用户积分不足】,openid:{}",openid);

@@ -1,5 +1,6 @@
 package com.drag.cstgroup.user.controller;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -19,7 +20,7 @@ import com.drag.cstgroup.user.vo.ScoreRecordVo;
 
 
 @RestController
-@RequestMapping(value = "/cstgroup/score")
+@RequestMapping(value = "/cstgroup/score", produces = "application/json;charset=utf-8")
 public class ScoreController {
 	
 	private final static Logger log = LoggerFactory.getLogger(ScoreController.class);
@@ -46,8 +47,21 @@ public class ScoreController {
 	 * @return
 	 */
 	@RequestMapping(value = "/scoresend", method = {RequestMethod.POST,RequestMethod.GET})
-	public @ResponseBody ResponseEntity<BaseResponse> scoreSend(@RequestParam String openid,@RequestParam String sendopenid,int score) {
+	public @ResponseBody ResponseEntity<BaseResponse> scoreSend(@RequestParam String openid,@RequestParam String sendopenid,@RequestParam int score) {
 		BaseResponse resp =  scoreService.sendScore(openid,sendopenid,score);
+		return new ResponseEntity<BaseResponse>(resp, HttpStatus.OK);
+	}
+	
+	/**
+	 * 购买积分
+	 * @param openid
+	 * @param score
+	 * @param price
+	 * @return
+	 */
+	@RequestMapping(value = "/scorebuy", method = {RequestMethod.POST,RequestMethod.GET})
+	public @ResponseBody ResponseEntity<BaseResponse> buyScore(@RequestParam String openid,@RequestParam int score,@RequestParam BigDecimal price) {
+		BaseResponse resp =  scoreService.buyScore(openid,score,price);
 		return new ResponseEntity<BaseResponse>(resp, HttpStatus.OK);
 	}
 	

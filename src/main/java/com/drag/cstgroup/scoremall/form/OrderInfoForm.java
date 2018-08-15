@@ -11,6 +11,11 @@ import lombok.Data;
  */
 @Data
 public class OrderInfoForm {
+	
+	/**
+	 * 订单号
+	 */
+	private String orderid;
 	/**
 	 * 用户id
 	 */

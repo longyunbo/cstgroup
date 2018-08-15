@@ -35,8 +35,8 @@ public class UserScoreRecord implements Serializable {
 
 	private static final long serialVersionUID = -5807402303998048344L;
 	
-	//积分来源类型:pt-拼团,ms-秒杀,zl-助力,kj-砍价,send-赠送积分,return-下级返回积分,recharge-充值,buy-积分购买,get-获赠
-	public static String TYPE_RECHARGE = "recharge";
+	//积分来源类型:pt-拼团,ms-秒杀,zl-助力,kj-砍价,return-下级返回积分,buy-积分购买,send-赠送积分,get-获赠
+//	public static String TYPE_RECHARGE = "recharge";
 	public static String TYPE_RETURN = "return";
 	public static String TYPE_SEND = "send";
 	public static String TYPE_GET = "get";
@@ -76,6 +76,14 @@ public class UserScoreRecord implements Serializable {
 	 * 获得积分
 	 */
 	private int availableScore;
+	/**
+	 * 购买积分订单号
+	 */
+	private String tpOrderId;
+	/**
+	 * 客如云返回的订单号
+	 */
+	private String orderId;
 	/**
 	 * 创建时间
 	 */
