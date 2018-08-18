@@ -49,8 +49,6 @@ public class PayService {
 			log.info("【会员充值传入参数】:PayForm= {}",JSON.toJSONString(form));
 			String openid = form.getOpenid();
 			BigDecimal price = form.getPrice();
-			//赠送的金额=充值的金额/10
-			BigDecimal extraBalance = price.divide(new BigDecimal(10));
 			//微信商户订单号
 			String outTradeNo = form.getOutTradeNo();
 			User us = userDao.findByOpenid(openid);
@@ -61,6 +59,8 @@ public class PayService {
 				return resp;
 			}
 			int uid = us.getId();
+			//赠送的金额=充值的金额/10
+			BigDecimal extraBalance = price.divide(new BigDecimal(10));
 			//额外赠送的余额
 			BigDecimal extra_balance = us.getExtraBalance();
 			//余额
@@ -94,9 +94,23 @@ public class PayService {
 			}else {
 				String kryBalance = presp.getBalance();
 				if(!StringUtil.isEmpty(kryBalance)) {
+					BigDecimal rechargeBalance = us.getRechargeBalance();
+					rechargeBalance = rechargeBalance.add(price);
+					int totalRechargeBalance = rechargeBalance.intValue();
+					//0-普通会员，1-银卡，2-金卡，3-铂金卡
+					if(totalRechargeBalance<5000) {
+						us.setRankLevel(0);
+					}else if(totalRechargeBalance >= 5000 && totalRechargeBalance < 10000) {
+						us.setRankLevel(1);
+					}else if(totalRechargeBalance >= 10000 && totalRechargeBalance < 20000) {
+						us.setRankLevel(2);
+					}else {
+						us.setRankLevel(3);
+					}
 					//更新用户数据
 					us.setExtraBalance(extra_balance);
 					us.setBalance(new BigDecimal(kryBalance));
+					us.setRechargeBalance(rechargeBalance);
 					userDao.saveAndFlush(us);
 				}else {
 					resp.setReturnCode(Constant.RECHARGE_ERROR);

@@ -113,7 +113,7 @@ public class OrderInfo implements Serializable {
 	/**
 	 * 物流公司名称
 	 */
-	private String compname;
+//	private String compname;
 	/**
 	 * 商品详细描述
 	 */
@@ -121,7 +121,7 @@ public class OrderInfo implements Serializable {
 	/**
 	 * 物流单号
 	 */
-	private String transportId;
+//	private String transportId;
 	/**
 	 * 收货人姓名
 	 */
@@ -162,6 +162,18 @@ public class OrderInfo implements Serializable {
 	 * 发票内容
 	 */
 	private String invContent;
+	/**
+	 * 发票电话
+	 */
+	private String invTel;
+	/**
+	 * 发票人姓名
+	 */
+	private String invName;
+	/**
+	 * 发票邮箱
+	 */
+	private String invEmail;
 	/**
 	 * 开票时间
 	 */

@@ -261,7 +261,7 @@ public class KeruyunService {
 		try {
 			String commParam = SignUtil.getComParam(appKey,secretKey);
 			String createCustomerUrl = String.format("%s/open/v1/crm/point/add?%s",keruyunurl,commParam);
-			log.info("【客如云会员增加积分传入参数】:customerId= {},score= {}",customerId,score);
+			log.info("【客如云会员增加积分传入参数】:createCustomerUrl {}",createCustomerUrl);
 			JSONObject json = new JSONObject();
 			json.put("customerId", customerId);
 			json.put("points", score);
@@ -308,7 +308,7 @@ public class KeruyunService {
 		try {
 			String commParam = SignUtil.getComParam(appKey,secretKey);
 			String createCustomerUrl = String.format("%s/open/v1/crm/point/cut?%s",keruyunurl,commParam);
-			log.info("【客如云会员扣减积分传入参数】:customerId= {},score= {}",customerId,score);
+			log.info("【客如云会员扣减积分传入参数】:createCustomerUrl= {}",createCustomerUrl);
 			JSONObject json = new JSONObject();
 			json.put("customerId", customerId);
 			json.put("points", score);
@@ -355,6 +355,7 @@ public class KeruyunService {
 			String commParam = SignUtil.getComParam(appKeyDc,secretKeyDc);
 			String createCustomerUrl = String.format("%s/open/v1/snack/order/create?%s",keruyunurl,commParam);
 			log.info("【客如云快餐下单传入参数】:PayForm= {}",JSON.toJSONString(form));
+			log.info("【客如云快餐下单传入参数】:createCustomerUrl= {}",createCustomerUrl);
 			String openid = form.getOpenid();
 			BigDecimal price = form.getPrice();
 			String tpOrderId = form.getTpOrderId();

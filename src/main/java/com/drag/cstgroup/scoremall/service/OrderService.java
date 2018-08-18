@@ -17,9 +17,11 @@ import com.drag.cstgroup.common.exception.AMPException;
 import com.drag.cstgroup.keruyun.service.KeruyunService;
 import com.drag.cstgroup.scoremall.dao.OrderDetailDao;
 import com.drag.cstgroup.scoremall.dao.OrderInfoDao;
+import com.drag.cstgroup.scoremall.dao.OrderShipperDao;
 import com.drag.cstgroup.scoremall.dao.ProductInfoDao;
 import com.drag.cstgroup.scoremall.entity.OrderDetail;
 import com.drag.cstgroup.scoremall.entity.OrderInfo;
+import com.drag.cstgroup.scoremall.entity.OrderShipper;
 import com.drag.cstgroup.scoremall.entity.ProductInfo;
 import com.drag.cstgroup.scoremall.form.OrderDetailForm;
 import com.drag.cstgroup.scoremall.form.OrderInfoForm;
@@ -50,6 +52,8 @@ public class OrderService {
 	private OrderInfoDao orderInfoDao;
 	@Autowired
 	private OrderDetailDao orderDetailDao;
+	@Autowired
+	private OrderShipperDao orderShipperDao;
 	@Autowired
 	private UserDao userDao;
 	@Autowired
@@ -133,6 +137,17 @@ public class OrderService {
 				order.setCreateTime(new Timestamp(System.currentTimeMillis()));
 				order.setUpdateTime(new Timestamp(System.currentTimeMillis()));
 				orderInfoDao.save(order);
+				
+				//插入物流表
+				OrderShipper shipper = new OrderShipper();
+				shipper.setId(shipper.getId());
+				shipper.setOrderid(orderid);
+				shipper.setUid(uid);
+				shipper.setReceiptName(receiptName);
+				shipper.setReceiptTel(receiptTel);
+				shipper.setReceiptAddress(receiptAddress);
+				shipper.setCreateTime(new Timestamp(System.currentTimeMillis()));
+				orderShipperDao.save(shipper);
 				
 				List<OrderDetailForm> orderList = form.getOrderDetail();
 				if(orderList != null && orderList.size() > 0) {

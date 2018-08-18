@@ -69,6 +69,18 @@ public class OrderInfoForm {
 	 */
 	private String invContent;
 	/**
+	 * 发票电话
+	 */
+	private String invTel;
+	/**
+	 * 发票人姓名
+	 */
+	private String invName;
+	/**
+	 * 发票邮箱
+	 */
+	private String invEmail;
+	/**
 	 * 订单方式（0:快递到家，1:送货上门）
 	 */
 	private int orderType;

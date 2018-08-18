@@ -39,9 +39,4 @@ public class KeruyunController {
 		return new ResponseEntity<JSONObject>(Json, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value = "/ordercreate", method = {RequestMethod.POST,RequestMethod.GET})
-	public @ResponseBody ResponseEntity<PayResp> ordercreate(@RequestBody PayForm form) {
-		PayResp Json = keruyunService.createOrder(form);
-		return new ResponseEntity<PayResp>(Json, HttpStatus.OK);
-	}
 }

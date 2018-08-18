@@ -2,6 +2,9 @@ package com.drag.cstgroup.user.controller;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -117,6 +120,17 @@ public class UserController {
 	public @ResponseBody ResponseEntity<List<UserVo>> queryChidrenUser(@RequestParam(required = true) int uid) {
 		List<UserVo> userVo = userService.queryChidrenUser(uid);
 		return new ResponseEntity<List<UserVo>>(userVo, HttpStatus.OK);
+	}
+	
+	/**
+	 * 用户上传图片
+	 * @param request
+	 * @param response
+	 * @throws Exception
+	 */
+	@RequestMapping(value = "/picture", method = {RequestMethod.POST,RequestMethod.GET})
+    public void uploadPicture(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		userService.uploadPicture(request, response);
 	}
 	
 	

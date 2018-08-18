@@ -121,7 +121,7 @@ public class User implements Serializable {
 	/**
 	 * 总充值金额
 	 */
-	private int rechargeBalance;
+	private BigDecimal rechargeBalance;
 	
 	//-----------企业信息------------
 	/**
