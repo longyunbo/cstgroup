@@ -70,8 +70,8 @@ public class OrderController {
 	 * @return
 	 */
 	@RequestMapping(value = "/myorders", method = {RequestMethod.POST,RequestMethod.GET})
-	public @ResponseBody ResponseEntity<List<OrderInfoVo>> myorders(@RequestParam(required = true)  String openid) {
-		List<OrderInfoVo> list = orderInfoService.myOrders(openid);
+	public @ResponseBody ResponseEntity<List<OrderInfoVo>> myorders(@RequestParam(required = true)  String openid,@RequestParam String type) {
+		List<OrderInfoVo> list = orderInfoService.myOrders(openid,type);
 		return new ResponseEntity<List<OrderInfoVo>>(list, HttpStatus.OK);
 	}
 	

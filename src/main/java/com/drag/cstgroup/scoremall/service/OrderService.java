@@ -320,14 +320,16 @@ public class OrderService {
 				UserTicketTemplate  template = userTicketTemplateDao.findByGoodsIdAndType(goodsId, type);
 				//发送卡券
 				if(template != null) {
-					UserTicket ticket = new UserTicket();
-					BeanUtils.copyProperties(template, ticket);
-					ticket.setId(ticket.getId());
-					ticket.setUid(uid);
-					ticket.setNumber(number);
-					ticket.setStatus(UserTicket.STATUS_NO);
-					ticket.setCreateTime((new Timestamp(System.currentTimeMillis())));
-					userTicketDao.save(ticket);
+					for(int i = 0;i < number; i++) {
+						UserTicket ticket = new UserTicket();
+						BeanUtils.copyProperties(template, ticket);
+						ticket.setId(ticket.getId());
+						ticket.setUid(uid);
+						ticket.setNumber(1);
+						ticket.setStatus(UserTicket.STATUS_NO);
+						ticket.setCreateTime((new Timestamp(System.currentTimeMillis())));
+						userTicketDao.save(ticket);
+					}
 				}
 			}
 			
@@ -374,6 +376,7 @@ public class OrderService {
 				order.setBillingType(billingType);
 				order.setInvPayee(invPayee);
 				order.setInvContent(invContent);
+				order.setBillTime(new Timestamp(System.currentTimeMillis()));
 				order.setUpdateTime(new Timestamp(System.currentTimeMillis()));
 				orderInfoDao.saveAndFlush(order);
 			}else {
@@ -427,13 +430,18 @@ public class OrderService {
 	 * @param openid
 	 * @return
 	 */
-	public List<OrderInfoVo> myOrders(String openid){
+	public List<OrderInfoVo> myOrders(String openid,String type){
 		log.info("【我的订单传入参数】:{}", openid);
 		List<OrderInfoVo> orderResp = new ArrayList<OrderInfoVo>();
 		User user = userDao.findByOpenid(openid);
 		if(user != null) {
 			int uid = user.getId();
-			List<OrderInfo> orderList = orderInfoDao.findByUid(uid);
+			List<OrderInfo> orderList = null;
+			if(!StringUtil.isEmpty(type)) {
+				orderList = orderInfoDao.findByUidAndType(uid,type);
+			}else {
+				orderList = orderInfoDao.findByUid(uid);
+			}
 			for (OrderInfo order : orderList) {
 				OrderInfoVo vo = new OrderInfoVo();
 				BeanUtils.copyProperties(order, vo,new String[]{"createTime", "updateTime","billTime"});

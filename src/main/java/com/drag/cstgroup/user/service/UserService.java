@@ -1,46 +1,45 @@
 package com.drag.cstgroup.user.service;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.support.StandardMultipartHttpServletRequest;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.drag.cstgroup.common.Constant;
 import com.drag.cstgroup.common.exception.AMPException;
 import com.drag.cstgroup.keruyun.service.KeruyunService;
+import com.drag.cstgroup.scoremall.form.OrderInfoForm;
 import com.drag.cstgroup.user.dao.UserDao;
 import com.drag.cstgroup.user.dao.UserProfessionDao;
 import com.drag.cstgroup.user.dao.UserRankLevelDao;
+import com.drag.cstgroup.user.dao.UserReceivingAddressDao;
 import com.drag.cstgroup.user.entity.User;
 import com.drag.cstgroup.user.entity.UserProfession;
 import com.drag.cstgroup.user.entity.UserRankLevel;
+import com.drag.cstgroup.user.entity.UserReceivingAddress;
 import com.drag.cstgroup.user.form.UserForm;
 import com.drag.cstgroup.user.resp.UserResp;
+import com.drag.cstgroup.user.vo.UserReceivingAddressVo;
 import com.drag.cstgroup.user.vo.UserVo;
 import com.drag.cstgroup.utils.BeanUtils;
 import com.drag.cstgroup.utils.DateUtil;
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileUploadException;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.*;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -56,6 +55,8 @@ public class UserService {
 	private UserProfessionDao userProfessionDao;
 	@Autowired
 	private KeruyunService keruyunService;
+	@Autowired
+	private UserReceivingAddressDao userReceivingAddressDao;
 
 	/**
 	 * 检查权限
@@ -193,6 +194,89 @@ public class UserService {
 		}
 	}
 	
+	
+	
+	/**
+	 * 更新用户地址接口
+	 * @param form
+	 * @return
+	 */
+	@Transactional
+	public UserResp userAddress(OrderInfoForm form) {
+		log.info("【更新地址传入参数】form = {}",JSON.toJSONString(form));
+		UserResp baseResp = new UserResp();
+		try {
+			String openid = form.getOpenid();
+			User us = userDao.findByOpenid(openid);
+			if(us == null) {
+				baseResp.setReturnCode(Constant.FAIL);
+				baseResp.setErrorMessage("该用户不存在!");
+				return baseResp;
+			}
+			int uid = us.getId();
+			//收货人
+			String receiptName  = form.getReceiptName();
+			//收货人联系方式
+			String receiptTel = form.getReceiptTel();
+			//所在区域
+			String region = form.getRegion();
+			//邮政编码
+			String postalcode = form.getPostalcode();
+			//地址
+			String receiptAddress = form.getReceiptAddress();
+			UserReceivingAddress address = userReceivingAddressDao.findByUid(uid);
+			if(address != null) {
+				BeanUtils.copyProperties(form, address);
+				address.setUpdateTime(new Timestamp(System.currentTimeMillis()));
+				userReceivingAddressDao.saveAndFlush(address);
+			}else {
+				address = new UserReceivingAddress();
+				address.setId(address.getId());
+				address.setPostalcode(postalcode);
+				address.setReceiptAddress(receiptAddress);
+				address.setReceiptName(receiptName);
+				address.setReceiptTel(receiptTel);
+				address.setRegion(region);
+				address.setUid(uid);
+				address.setCreateTime(new Timestamp(System.currentTimeMillis()));
+				address.setUpdateTime(new Timestamp(System.currentTimeMillis()));
+				userReceivingAddressDao.save(address);
+			}
+			baseResp.setReturnCode(Constant.SUCCESS);
+			baseResp.setErrorMessage("更新地址成功!");
+			return baseResp;
+		} catch (Exception e) {
+			log.error("【更新用户地址信息异常】{}",e);
+			throw AMPException.getException("系统异常!");
+		}
+	}
+	
+	/**
+	 * 查询地址信息
+	 * @param openid
+	 * @return
+	 */
+	public UserReceivingAddressVo queryAddressByOpenid(String openid) {
+		log.info("【根据openid获取用户地址信息】openid = {}",openid);
+		UserReceivingAddressVo addressVo = new UserReceivingAddressVo();
+		try {
+			User user = userDao.findByOpenid(openid);
+			if(user != null) {
+				int uid = user.getId();
+				UserReceivingAddress address = userReceivingAddressDao.findByUid(uid);
+				if(address != null) {
+					BeanUtils.copyProperties(address, addressVo,new String[]{"createTime", "updateTime"});
+					addressVo.setCreateTime((DateUtil.format(user.getCreateTime(), "yyyy-MM-dd HH:mm:ss")));
+					addressVo.setUpdateTime((DateUtil.format(user.getUpdateTime(), "yyyy-MM-dd HH:mm:ss")));
+				}
+				
+			}
+		} catch (Exception e) {
+			log.error("获取用户地址异常,{}",e);
+		}
+		return addressVo;
+	}
+	
 	/**
 	 * 根据openid获取用户信息
 	 * @param openid
@@ -271,84 +355,61 @@ public class UserService {
 	}
 	
 	
-	
+	/**
+	 * 用户上传图片
+	 * @param request
+	 * @param response
+	 * @throws Exception
+	 */
 	public void uploadPicture(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        //获取文件需要上传到的路径
-        String path = request.getRealPath("/upload") + "/";
-        
-        File dir = new File(path);
-        if (!dir.exists()) {
-            dir.mkdir();
-        }
-        log.debug("path=" + path);
-
-        request.setCharacterEncoding("utf-8");  //设置编码
-        //获得磁盘文件条目工厂
-        DiskFileItemFactory factory = new DiskFileItemFactory();
-
-        //如果没以下两行设置的话,上传大的文件会占用很多内存，
-        //设置暂时存放的存储室,这个存储室可以和最终存储文件的目录不同
-        /**
-         * 原理: 它是先存到暂时存储室，然后再真正写到对应目录的硬盘上，
-         * 按理来说当上传一个文件时，其实是上传了两份，第一个是以 .tem 格式的
-         * 然后再将其真正写到对应目录的硬盘上
-         */
-        factory.setRepository(dir);
-        //设置缓存的大小，当上传文件的容量超过该缓存时，直接放到暂时存储室
-        factory.setSizeThreshold(1024 * 1024);
-        //高水平的API文件上传处理
-        ServletFileUpload upload = new ServletFileUpload(factory);
-        try {
-            List<FileItem> list = upload.parseRequest(request);
-            FileItem picture = null;
-            for (FileItem item : list) {
-                //获取表单的属性名字
-                String name = item.getFieldName();
-                //如果获取的表单信息是普通的 文本 信息
-                if (item.isFormField()) {
-                    //获取用户具体输入的字符串
-                    String value = item.getString();
-                    request.setAttribute(name, value);
-                    log.debug("name=" + name + ",value=" + value);
-                } else {
-                    picture = item;
-                }
-            }
-
-            //自定义上传图片的名字为userId.jpg
-            String fileName = request.getAttribute("userId") + ".jpg";
-            String destPath = path + fileName;
-            log.debug("destPath=" + destPath);
-
-            //真正写到磁盘上
-            File file = new File(destPath);
-            OutputStream out = new FileOutputStream(file);
-            InputStream in = picture.getInputStream();
-            int length = 0;
-            byte[] buf = new byte[1024];
-            // in.read(buf) 每次读到的数据存放在buf 数组中
-            while ((length = in.read(buf)) != -1) {
-                //在buf数组中取出数据写到（输出流）磁盘上
-                out.write(buf, 0, length);
-            }
-            in.close();
-            out.close();
-        } catch (FileUploadException e1) {
-            log.error("", e1);
-        } catch (Exception e) {
-            log.error("", e);
-        }
-
-
-        PrintWriter printWriter = response.getWriter();
-        response.setContentType("application/json");
-        response.setCharacterEncoding("utf-8");
-        HashMap<String, Object> res = new HashMap<String, Object>();
-        res.put("success", true);
-        printWriter.write(JSON.toJSONString(res));
-        printWriter.flush();
-    }
-	
+	        //获取文件需要上传到的路径
+	        File directory = new File("../cstgroup");
+	        String path = directory.getCanonicalPath() + "/upload/";
+	        String companyname = request.getParameter("companyname").toString();
+	        // 判断存放上传文件的目录是否存在（不存在则创建）
+	        File dir = new File(path);
+	        if (!dir.exists()) {
+	            dir.mkdir();
+	        }
+	        log.debug("path=" + path);
+	        request.setCharacterEncoding("utf-8"); //设置编码
+	        JSONArray jsonArray = new JSONArray();
+	        try {
+	            StandardMultipartHttpServletRequest req = (StandardMultipartHttpServletRequest) request;
+	            Iterator<String> iterator = req.getFileNames();
+	            while (iterator.hasNext()) {
+	                HashMap<String, Object> res = new HashMap<String, Object>();
+	                MultipartFile file = req.getFile(iterator.next());
+	                // 获取文件名
+	                String fileNames = file.getOriginalFilename();
+	                int split = fileNames.lastIndexOf(".");
+	                //获取上传文件的后缀
+	                String extName = fileNames.substring(split + 1, fileNames.length());
+	                //组成新的图片名称
+	                String newName = companyname + "." + extName;
+	                String destPath = path + newName;
+	                log.debug("destPath=" + destPath);
+	 
+	                //真正写到磁盘上
+	                File file1 = new File(destPath);
+	                OutputStream out = new FileOutputStream(file1);
+	                out.write(file.getBytes());
+	                res.put("url", destPath);
+	                jsonArray.add(res);
+	 
+	                out.close();
+	            }
+	        } catch (Exception e) {
+	            log.error("", e);
+	        }
+	 
+	        PrintWriter printWriter = response.getWriter();
+	        response.setContentType("application/json");
+	        response.setCharacterEncoding("utf-8");
+	        printWriter.write(JSON.toJSONString(jsonArray));
+	        printWriter.flush();
+	 
+	    }
 	
 	
 	

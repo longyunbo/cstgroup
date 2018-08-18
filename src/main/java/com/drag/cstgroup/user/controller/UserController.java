@@ -17,10 +17,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.drag.cstgroup.scoremall.form.OrderInfoForm;
 import com.drag.cstgroup.user.entity.UserProfession;
 import com.drag.cstgroup.user.form.UserForm;
 import com.drag.cstgroup.user.resp.UserResp;
 import com.drag.cstgroup.user.service.UserService;
+import com.drag.cstgroup.user.vo.UserReceivingAddressVo;
 import com.drag.cstgroup.user.vo.UserVo;
 import com.drag.cstgroup.utils.WxUtil;
 
@@ -133,5 +135,26 @@ public class UserController {
 		userService.uploadPicture(request, response);
 	}
 	
+	/**
+	 * 用户地址更新
+	 * @param form
+	 * @return
+	 */
+	@RequestMapping(value = "/useraddress", method = {RequestMethod.POST,RequestMethod.GET})
+	public @ResponseBody ResponseEntity<UserResp> userAddress(@RequestBody OrderInfoForm form) {
+		UserResp br = userService.userAddress(form);
+		return new ResponseEntity<UserResp>(br, HttpStatus.OK);
+	}
+	
+	/**
+	 * 获取用户地址
+	 * @param openid
+	 * @return
+	 */
+	@RequestMapping(value = "/queryaddress", method = {RequestMethod.POST,RequestMethod.GET})
+	public @ResponseBody ResponseEntity<UserReceivingAddressVo> queryAddressByOpenid(@RequestParam(required = true) String openid) {
+		UserReceivingAddressVo br = userService.queryAddressByOpenid(openid);
+		return new ResponseEntity<UserReceivingAddressVo>(br, HttpStatus.OK);
+	}
 	
 }

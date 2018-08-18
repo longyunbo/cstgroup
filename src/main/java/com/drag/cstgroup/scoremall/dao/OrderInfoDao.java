@@ -25,6 +25,9 @@ public interface OrderInfoDao extends JpaRepository<OrderInfo, String>, JpaSpeci
 	@Query(value = "select * from t_order_info where uid = ?1", nativeQuery = true)
 	List<OrderInfo> findByUid(int uid);
 	
+	@Query(value = "select * from t_order_info where uid = ?1 and type = ?2", nativeQuery = true)
+	List<OrderInfo> findByUidAndType(int uid,String type);
+	
 	@Query(value = "select * from t_order_info where uid = ?1 and is_billing = 1", nativeQuery = true)
 	List<OrderInfo> findByUidAndBill(int uid);
 }

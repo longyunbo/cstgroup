@@ -101,6 +101,10 @@ public class OrderInfoForm {
 	 */
 	private String postalcode;
 	/**
+	 * 市级
+	 */
+	private String cityName;
+	/**
 	 * 地址
 	 */
 	private String receiptAddress;

@@ -96,14 +96,26 @@ public class PayService {
 				if(!StringUtil.isEmpty(kryBalance)) {
 					BigDecimal rechargeBalance = us.getRechargeBalance();
 					rechargeBalance = rechargeBalance.add(price);
-					int totalRechargeBalance = rechargeBalance.intValue();
+//					int totalRechargeBalance = rechargeBalance.intValue();
+					int intPrice = price.intValue();
+					//一次性充值固定的金额，晋升会员,5000-银卡，10000-金卡，20000-铂金卡
 					//0-普通会员，1-银卡，2-金卡，3-铂金卡
-					if(totalRechargeBalance<5000) {
-						us.setRankLevel(0);
-					}else if(totalRechargeBalance >= 5000 && totalRechargeBalance < 10000) {
-						us.setRankLevel(1);
-					}else if(totalRechargeBalance >= 10000 && totalRechargeBalance < 20000) {
-						us.setRankLevel(2);
+					int level = us.getRankLevel();
+					
+					if(intPrice < 5000) {
+						us.setRankLevel(level);
+					}else if(intPrice >= 5000 && intPrice < 10000) {
+						if(level >= 1) {
+							us.setRankLevel(level);
+						}else {
+							us.setRankLevel(1);
+						}
+					}else if(intPrice >= 10000 && intPrice < 20000) {
+						if(level >= 2) {
+							us.setRankLevel(level);
+						}else {
+							us.setRankLevel(2);
+						}
 					}else {
 						us.setRankLevel(3);
 					}

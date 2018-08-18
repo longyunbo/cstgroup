@@ -150,6 +150,29 @@ public class ScoreService {
 				return resp;
 			}
 			
+			BigDecimal consumeBalance = us.getConsumeBalance();
+			consumeBalance = consumeBalance.add(price);
+			int totalConsumeBalance = consumeBalance.intValue();
+			
+			// 0-普通会员，1-银卡，2-金卡，3-铂金卡
+			int level = us.getRankLevel();
+			
+			if (totalConsumeBalance < 5000) {
+				if(level < 1) {
+					us.setRankLevel(0);
+				}
+			} else if (totalConsumeBalance >= 5000 && totalConsumeBalance < 20000) {
+				if(level < 2) {
+					us.setRankLevel(1);
+				}
+			} else if (totalConsumeBalance >= 20000 && totalConsumeBalance < 50000) {
+				if(level < 3) {
+					us.setRankLevel(2);
+				}
+			} else {
+				us.setRankLevel(3);
+			}
+			
 			us.setBalance(balance);
 			userDao.saveAndFlush(us);
 			

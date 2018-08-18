@@ -92,6 +92,10 @@ public class UserVo implements Serializable {
 	 * 总充值金额
 	 */
 	private BigDecimal rechargeBalance;
+	/**
+	 * 总消费金额
+	 */
+	private BigDecimal consumeBalance;
 	
 	//-----------企业信息------------
 	/**

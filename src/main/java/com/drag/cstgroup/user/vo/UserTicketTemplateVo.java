@@ -1,7 +1,6 @@
 package com.drag.cstgroup.user.vo;
 
 import java.math.BigDecimal;
-import java.util.Date;
 
 import javax.persistence.Id;
 
