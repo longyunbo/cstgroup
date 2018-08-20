@@ -79,6 +79,10 @@ public class UserTicketVo implements Serializable {
 	 */
 	private int score;
 	/**
+	 * 购买规格
+	 */
+	private String norms;
+	/**
 	 * 使用期限
 	 */
 	private int term;

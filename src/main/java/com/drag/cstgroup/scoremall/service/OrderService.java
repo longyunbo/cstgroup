@@ -326,6 +326,7 @@ public class OrderService {
 						ticket.setId(ticket.getId());
 						ticket.setUid(uid);
 						ticket.setNumber(1);
+						ticket.setNorms(norms);
 						ticket.setStatus(UserTicket.STATUS_NO);
 						ticket.setCreateTime((new Timestamp(System.currentTimeMillis())));
 						userTicketDao.save(ticket);
