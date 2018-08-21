@@ -145,15 +145,14 @@ public class KeruyunService {
 	 * @param openid
 	 * @return
 	 */
-	public JSONObject login(String openid){
-		log.info("【客如云用户登录，传入参数】openid:{}",openid);
+	public JSONObject loginMobile(String mobile){
+		log.info("【客如云用户登录，传入参数】mobile:{}",mobile);
 		JSONObject resp = new JSONObject();
 		try {
 			String commParam = SignUtil.getComParam(appKey,secretKey);
 			String createCustomerUrl = String.format("%s/open/v1/crm/login?%s",keruyunurl,commParam);
 			JSONObject json = new JSONObject();
-			User us = userDao.findByOpenid(openid);
-			json.put("loginId", us.getMobile());
+			json.put("loginId", mobile);
 			json.put("loginType", 0);
 			String httpresult = HttpsUtil.doPost(createCustomerUrl, json.toString(), "utf-8");
 			if (httpresult != null) {
@@ -174,15 +173,14 @@ public class KeruyunService {
 	 * @return
 	 * @throws NoSuchAlgorithmException 
 	 */
-	public JSONObject getCustomerDetailById(String openid){
-		log.info("【客如云查询用户，传入参数】openid:{}",openid);
+	public JSONObject getCustomerDetailByCustomerId(String customerId){
+		log.info("【客如云查询用户，传入参数】customerId:{}",customerId);
 		JSONObject resp = new JSONObject();
 		try {
 			String commParam = SignUtil.getComParam(appKey,secretKey);
 			String createCustomerUrl = String.format("%s/open/v1/crm/getCustomerDetailById?%s",keruyunurl,commParam);
 			JSONObject json = new JSONObject();
-			User us = userDao.findByOpenid(openid);
-			json.put("customerId", us.getCustomerId());
+			json.put("customerId", customerId);
 			log.info("【客如云用户查询传入参数】:json={}",json);
 			String httpresult = HttpsUtil.doPost(createCustomerUrl, json.toString(), "utf-8");
 			log.info("【客如云用户查询返回参数】:httpresult={}",httpresult);

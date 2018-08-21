@@ -173,6 +173,7 @@ public class ScoreService {
 				us.setRankLevel(3);
 			}
 			
+			us.setConsumeBalance(consumeBalance);
 			us.setBalance(balance);
 			userDao.saveAndFlush(us);
 			

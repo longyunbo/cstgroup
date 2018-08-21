@@ -22,6 +22,7 @@ import org.springframework.web.multipart.support.StandardMultipartHttpServletReq
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.drag.cstgroup.common.Constant;
 import com.drag.cstgroup.common.exception.AMPException;
 import com.drag.cstgroup.keruyun.service.KeruyunService;
@@ -136,6 +137,7 @@ public class UserService {
 		UserResp baseResp = new UserResp();
 		try {
 			String openid = form.getOpenid();
+			String mobile = form.getMobile();
 			User us = userDao.findByOpenid(openid);
 			if(us == null) {
 				baseResp.setReturnCode(Constant.FAIL);
@@ -155,9 +157,31 @@ public class UserService {
 				baseResp.setErrorMessage("更新用户成功!");
 				return baseResp;
 			}else {
-				baseResp.setReturnCode(Constant.FAIL);
-				baseResp.setErrorMessage(resp.getErrorMessage());
-				return baseResp;
+				JSONObject loginJson = keruyunService.loginMobile(mobile);
+				if(loginJson != null && loginJson.size() > 0) {
+					String customerId = loginJson.getString("customerId");
+					JSONObject userJson =  keruyunService.getCustomerDetailByCustomerId(customerId);
+					if(userJson != null && userJson.size() > 0) {
+						Long integral = userJson.getLong("integral");
+						BigDecimal remainValue = userJson.getBigDecimal("remainValue");
+						us.setCustomerId(customerId);
+						us.setCustomerMainId(customerId);
+						us.setScore(integral.intValue());
+						us.setBalance(remainValue);
+						userDao.saveAndFlush(us);
+						baseResp.setReturnCode(Constant.SUCCESS);
+						baseResp.setErrorMessage("更新用户成功!");
+						return baseResp;
+					}else {
+						baseResp.setReturnCode(Constant.FAIL);
+						baseResp.setErrorMessage(resp.getErrorMessage());
+						return baseResp;
+					}
+				}else {
+					baseResp.setReturnCode(Constant.FAIL);
+					baseResp.setErrorMessage(resp.getErrorMessage());
+					return baseResp;
+				}
 			}
 		} catch (Exception e) {
 			log.error("【更新用户信息异常】{}",e);

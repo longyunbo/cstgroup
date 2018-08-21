@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -14,8 +13,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.fastjson.JSONObject;
 import com.drag.cstgroup.keruyun.service.KeruyunService;
-import com.drag.cstgroup.pay.form.PayForm;
-import com.drag.cstgroup.pay.resp.PayResp;
+import com.drag.cstgroup.user.dao.UserDao;
+import com.drag.cstgroup.user.entity.User;
 
 
 @RestController
@@ -24,18 +23,19 @@ public class KeruyunController {
 	
 	@Autowired
 	KeruyunService keruyunService;
+	@Autowired
+	UserDao userDao;
 	
 	private final static Logger log = LoggerFactory.getLogger(KeruyunController.class);
 	
 	@RequestMapping(value = "/getuser", method = {RequestMethod.POST,RequestMethod.GET})
 	public @ResponseBody ResponseEntity<JSONObject> getUser(@RequestParam String openid) {
-		JSONObject Json = keruyunService.getCustomerDetailById(openid);
-		return new ResponseEntity<JSONObject>(Json, HttpStatus.OK);
-	}
-	
-	@RequestMapping(value = "/login", method = {RequestMethod.POST,RequestMethod.GET})
-	public @ResponseBody ResponseEntity<JSONObject> login(@RequestParam String openid) {
-		JSONObject Json = keruyunService.login(openid);
+		JSONObject Json = null;
+		User us = userDao.findByOpenid(openid);
+		if(us != null ) {
+			String customerId = us.getCustomerId();
+			Json = keruyunService.getCustomerDetailByCustomerId(customerId);
+		}
 		return new ResponseEntity<JSONObject>(Json, HttpStatus.OK);
 	}
 	
